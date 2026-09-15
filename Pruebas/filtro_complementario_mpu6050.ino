@@ -73,18 +73,17 @@ void loop() {
 
   // --- Ángulo desde el ACELERÓMETRO (usando trigonometría) ---
   // Válido cuando no hay mucha aceleración lineal (solo gravedad)
-  anguloAccX = atan2(accY_raw, sqrt(pow(accX_raw, 2) + pow(accZ_raw, 2))) * 180.0 / PI;
-  anguloAccY = atan2(-accX_raw, sqrt(pow(accY_raw, 2) + pow(accZ_raw, 2))) * 180.0 / PI;
+  anguloAccX = atan2(accY_raw, sqrt(pow(accX_raw, 2) + pow(accZ_raw, 2))) * 180.0 / PI; // -> atan2 devuelve en radianes
 
   // --- Velocidad angular del GIROSCOPO en grados/segundo ---
   float gyroX_dps = (gyroX_raw / SENS_GYRO) - gyroX_offset;
-  float gyroY_dps = (gyroY_raw / SENS_GYRO) - gyroY_offset;
+  
 
   // --- FILTRO COMPLEMENTARIO ---
   // Se integra el giroscopo (rápido, sin ruido) y se corrige con el
   // acelerómetro (preciso a largo plazo, sin deriva) según el peso ALPHA.
   anguloFiltradoX = ALPHA * (anguloFiltradoX + gyroX_dps * dt) + (1 - ALPHA) * anguloAccX;
-  anguloFiltradoY = ALPHA * (anguloFiltradoY + gyroY_dps * dt) + (1 - ALPHA) * anguloAccY;
+  
 
   // --- Salida para comparar los 3 métodos ---
   Serial.print("AccX: ");
