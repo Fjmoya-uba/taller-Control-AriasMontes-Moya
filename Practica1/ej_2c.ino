@@ -38,12 +38,10 @@ void loop() {
   unsigned long elapsed = micros() - start;
   float frecuencia = N * 1000000.0 / elapsed;*/
 
-  float distancia_cm = uS / US_POR_CM_IDA_VUELTA;
-
   Serial.print("Distancia: ");
   Serial.print(distancia_cm);
   Serial.print(" | Frecuencia: ");
-  Serial.print(frecuencia, 1);
-  Serial.println(" Hz");
+  //Serial.print(frecuencia, 1);
+  //Serial.println(" Hz");
   
 }
