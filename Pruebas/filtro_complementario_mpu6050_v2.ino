@@ -1,6 +1,6 @@
 /* Filtro complementario con MPU6050 y comunicacion binaria con MATLAB.
- * Trama: "abcd" + ax + ay + az + gx + gy + gz (seis float, 28 bytes).
- * Unidades: m/s^2 y rad/s, como lectura_imu.ino.
+ * Trama: "abcd" + anguloFiltradoX + anguloGyroX + anguloAccX.
+ * Son tres float en grados: 16 bytes por trama en total.
  */
 #include <Wire.h>
 #include <Servo.h>
@@ -15,7 +15,6 @@ const uint8_t TX_DECIMATION = 2;         // 50 tramas/s
 const float ALPHA = 0.96;
 const float SENS_ACC = 16384.0;          // LSB/g, rango +/-2 g
 const float SENS_GYRO = 131.0;           // LSB/(grados/s), rango +/-250
-const float GRAVEDAD = 9.80665;
 
 int16_t accX_raw, accY_raw, accZ_raw;
 int16_t gyroX_raw, gyroY_raw, gyroZ_raw;
@@ -35,21 +34,10 @@ void sendFloat(float value) {
 }
 
 void sendBinaryFrame() {
-  const float accX = (accX_raw / SENS_ACC) * GRAVEDAD;
-  const float accY = (accY_raw / SENS_ACC) * GRAVEDAD;
-  const float accZ = (accZ_raw / SENS_ACC) * GRAVEDAD;
-  const float gradosARadianes = PI / 180.0;
-  const float gyroX = (gyroX_raw / SENS_GYRO) * gradosARadianes;
-  const float gyroY = (gyroY_raw / SENS_GYRO) * gradosARadianes;
-  const float gyroZ = (gyroZ_raw / SENS_GYRO) * gradosARadianes;
-
   Serial.write("abcd", 4);
-  sendFloat(accX);
-  sendFloat(accY);
-  sendFloat(accZ);
-  sendFloat(gyroX);
-  sendFloat(gyroY);
-  sendFloat(gyroZ);
+  sendFloat(anguloFiltradoX);
+  sendFloat(anguloGyroX);
+  sendFloat(anguloAccX);
 }
 
 void setup() {
@@ -93,13 +81,10 @@ void loop() {
   const float dt = (ahoraUs - tiempoAnteriorUs) * 1.0e-6;
   tiempoAnteriorUs = ahoraUs;
 
-  anguloAccX = atan2((float)accY_raw,
-                     sqrt(sq((float)accX_raw) + sq((float)accZ_raw)))
-                * 180.0 / PI;
+  anguloAccX = atan2((float)accY_raw, sqrt(sq((float)accX_raw) + sq((float)accZ_raw)))* 180.0 / PI;
   const float gyroX_dps = (gyroX_raw / SENS_GYRO) - gyroX_offset;
   anguloGyroX += gyroX_dps * dt;
-  anguloFiltradoX = ALPHA * (anguloFiltradoX + gyroX_dps * dt)
-                    + (1.0 - ALPHA) * anguloAccX;
+  anguloFiltradoX = ALPHA * (anguloFiltradoX + gyroX_dps * dt) + (1.0 - ALPHA) * anguloAccX;
 
   if (++contadorTx >= TX_DECIMATION) {
     contadorTx = 0;
