@@ -1,22 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.io import loadmat
 
 # ============================================================
-# 1. CARGAR DATOS
+# 1. CARGAR DATOS DESDE MATLAB
 # ============================================================
 
-datos = np.loadtxt("datos_planta.csv", delimiter=",")
+datos = loadmat("mediciones_y_u.mat")
 
-t = datos[:, 0]
-u = datos[:, 1]
-y = datos[:, 2]
+# Para ver qué variables contiene el archivo:
+print(datos.keys())
 
-# Periodo de muestreo
+y = np.squeeze(datos[0]).astype(float)
+u = np.squeeze(datos[1]).astype(float)
+t = np.squeeze(datos[2]).astype(float)
+
 Ts = np.mean(np.diff(t))
 
 print(f"Ts = {Ts:.6f} s")
-print(f"Cantidad de muestras = {len(y)}")
-
+print(f"Muestras de y: {len(y)}")
+print(f"Muestras de u: {len(u)}")
 
 # ============================================================
 # 2. ARMAR LA REGRESION
