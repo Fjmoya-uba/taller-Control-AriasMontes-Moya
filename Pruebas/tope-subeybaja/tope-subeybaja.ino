@@ -8,6 +8,8 @@ Servo miServo;
 Adafruit_MPU6050 mpu;
 
 const byte PIN_SERVO = 9;
+NEW SKETCH
+
 const unsigned long SERIAL_BAUD = 115200;
 const unsigned long PERIODO_IMU_US = 10000;  // 100 Hz
 const float ALFA = 0.98f;                    // Peso del giroscopio
