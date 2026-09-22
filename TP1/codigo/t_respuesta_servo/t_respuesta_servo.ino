@@ -4,15 +4,6 @@
 #include <Wire.h>
 #include <math.h>
 
-// Ensayo de respuesta del conjunto servo + barra con la IMU montada.
-// Servo: D9. MPU6050: SDA/SCL (A4/A5 en Nano), mismo montaje que servo_mapeo.
-// Mantener la referencia horizontal de la calibracion. Alimentar el servo
-// con su fuente habitual y unir las masas con Arduino.
-// Monitor serie: 115200 baudios. Enviar 't' para realizar cada ensayo.
-// Bibliotecas: Servo, Adafruit MPU6050 y Adafruit Unified Sensor.
-// IMPORTANTE: 30 grados de BARRA no equivalen a 30 grados del EJE.
-// Los 70-85 ms del informe son del eje: no se validan directamente aqui.
-
 Servo servo;
 Adafruit_MPU6050 mpu;
 const int PULSO_INICIAL_US = 664;  // Barra aproximadamente a -10 grados.

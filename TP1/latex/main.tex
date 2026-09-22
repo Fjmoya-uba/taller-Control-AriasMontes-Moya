@@ -56,21 +56,6 @@
 % Hipervínculos (enlaces) en el documento (y modificación de atributos)
 \usepackage{url}
 \urlstyle{tt}
-\usepackage[colorlinks=true,linkcolor=black, urlcolor=blue]{hyperref}
-\hypersetup{
-    breaklinks,
-    baseurl       = http://,
-    pdfborder     = 0 0 0,
-    pdfpagemode   = UseNone,
-    pdfstartpage  = 1,
-    pdfcreator    = {Plantilla de informe de TP para \LaTeX{}},
-    bookmarksopen = true,
-    bookmarksdepth= 2,% to show sections and subsections
-    pdfauthor     = {Apellido~1, Apellido~2, Apellido~3},
-    pdftitle      = {-},
-    pdfsubject    = {Informe},
-    pdfkeywords   = {}%
-    }
 
 % ==== Paquetes para TikZ ====
 \usepackage{tikz}
@@ -107,7 +92,7 @@
         autogobble          % Eliminar espacio sobrante al comienzo
     }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% COMANDOS UTILES
+% COMANDOS ÚTILES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % los siguientes comandos permiten escribir de manera uniforme en todo el
 % documento
@@ -148,7 +133,7 @@
 \lstset{style=pythonstyle}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% COMANDOS UTILES
+% COMANDOS ÚTILES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % los siguientes comandos permiten escribir de manera uniforme en todo el
 % documento
@@ -167,20 +152,25 @@
 \usepackage{gensymb}
 
 
-% NO cargues otra vez \usepackage{biblatex}
-% NO uses 2 \addbibresource distintos salvo que realmente quieras 2 bases
-\usepackage[backend=biber,
-style=numeric-comp,
-sorting=none,
-language=spanish,
-doi=false,
-isbn=false,
-url=true,
-eprint=false
-]{biblatex}
-
-\addbibresource{referencias.bib}
 \usepackage{enumitem}
+
+% Bibliografía manual con cite + thebibliography (sin BibTeX ni Biber).
+% Compilar dos veces con LaTeX para resolver las citas y sus destinos.
+% Cargar hyperref al final para enlazar citas, figuras, tablas y secciones.
+\usepackage[colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue]{hyperref}
+\hypersetup{
+    breaklinks,
+    pdfborder     = {0 0 0},
+    pdfpagemode   = UseNone,
+    pdfstartpage  = 1,
+    pdfcreator    = {Plantilla de informe de TP para \LaTeX{}},
+    bookmarksopen = true,
+    bookmarksdepth= 2,
+    pdfauthor     = {Apellido~1, Apellido~2, Apellido~3},
+    pdftitle      = {-},
+    pdfsubject    = {Informe},
+    pdfkeywords   = {}
+}
 
 % INICIO DEL DOCUMENTO
 
@@ -195,7 +185,7 @@ eprint=false
 \vspace{0.2cm}
 {\scshape\Large Facultad de Ingeniería \par}
 \vspace{0.2cm}
-{\large 2° cuatrimestre 2026 \par}
+{\large 2.º cuatrimestre de 2026 \par}
 
 \vspace{2cm}
 
@@ -203,7 +193,7 @@ eprint=false
 
 \vspace{1cm}
 
-{\large \textbf{Trabajo Práctico N°1: Introducción al control digital}\par}
+{\large \textbf{Trabajo Práctico \Nro 1: Introducción al control digital}\par}
 
 \vspace{2cm}
 
@@ -211,7 +201,7 @@ eprint=false
 \renewcommand{\arraystretch}{1.3}
 \begin{tabular}{|m{6cm}|m{2cm}|m{5cm}|}
 \hline
-\multicolumn{3}{|c|}{\textbf{Integrantes Grupo N° 1}} \\
+\multicolumn{3}{|c|}{\textbf{Integrantes del grupo \Nro 1}} \\
 \hline
 \textbf{Nombre y apellido} & \textbf{Padrón} & \textbf{Correo} \\
 \hline
@@ -230,9 +220,10 @@ Lucas Fabrizio Arias Montes & 110876 & lfarias@fi.uba.ar \\
 \newpage
 
 
+
 \section{Introducción}
 
-El objetivo principal a desarrollar a lo largo de la materia será poder controlar un sistema de tipo \textit{Ball and Beam} como el que se observa en la figura \ref{fig:planta_bab}.
+El objetivo principal de la materia será controlar un sistema de tipo \textit{Ball and Beam} como el que se observa en la figura \ref{fig:planta_bab}.
 
 \begin{figure}[H]
     \centering
@@ -241,13 +232,11 @@ El objetivo principal a desarrollar a lo largo de la materia será poder control
     \label{fig:planta_bab}
 \end{figure}
 
-El sistema consta de un brazo mecánico impreso en 3D sobre el cual en lugar de una bola se encuentra montado un carrito que puede rodar libremente con rozamiento despreciable. Sobre el brazo están montados un sensor de distancia ultrasónico y una IMU \textbf{MPU6050}. La inclinación del brazo es controlada por un servomotor el cual permite que el carrito se mueva a lo largo del mismo gracias a la acción de la gravedad. Así mismo, es posible además comandar un ángulo de inclinación arbitrario al brazo a través de un potenciómetro, convirtiendo la tensión medida por el mismo en un ángulo mediante un software que se ejecuta en un microcontrolador Arduino Nano, a donde también se conecta toda la electrónica del sistema.\\
+El sistema consta de un brazo mecánico impreso en 3D sobre el cual, en lugar de una bola, se encuentra montado un carrito que puede rodar libremente con rozamiento despreciable. Sobre el brazo están montados un sensor de distancia ultrasónico y una IMU \textbf{MPU6050}. La inclinación del brazo es controlada por un servomotor que permite que el carrito se mueva a lo largo del mismo gracias a la acción de la gravedad. Asimismo, es posible comandar un ángulo de inclinación arbitrario al brazo a través de un potenciómetro, convirtiendo la tensión medida por el mismo en un ángulo mediante un software que se ejecuta en un microcontrolador Arduino Nano, al que también se conecta toda la electrónica del sistema.\\
 
-En este trabajo práctico se buscarán analizar las limitaciones que presentan los sensores y actuadores que serán utilizados para controlar el sistema así como las limitaciones adicionales que existen a la hora de enviar datos a través del puerto serie de Arduino, en particular para variables de tipo \texttt{float}. Todo ello con el fin de conocer las limitaciones que presenta el hardware con el que se va a trabajar a lo largo de la cursada y utilizar toda la información recopilada en etapas de diseño posteriores.
+En este trabajo práctico se buscará analizar las limitaciones que presentan los sensores y actuadores que serán utilizados para controlar el sistema, así como las limitaciones adicionales que existen a la hora de enviar datos a través del puerto serie de Arduino, en particular para variables de tipo \texttt{float}. Todo ello se realiza con el fin de conocer las limitaciones que presenta el hardware con el que se va a trabajar a lo largo de la cursada y utilizar toda la información recopilada en etapas de diseño posteriores.
 
 \subsection{Componentes utilizados}
-
-\textcolor{red}{Falta arreglar el tema de las referencias que no lo pude arreglar todavía.}
 
 Para la implementación del sistema \textit{Ball and Beam} se utilizó un
 Arduino Nano como unidad de procesamiento y control. La posición del móvil
@@ -289,7 +278,7 @@ obtenido en \texttt{ECHO}.
 
 Para estimar la inclinación de la barra se utiliza una unidad de medición
 inercial (IMU) basada en el MPU6050 (fig. \ref{fig:mpu6050}). Este dispositivo integra un
-acelerómetro de tres ejes y un giróscopo de tres ejes \cite{MPU6050}.
+acelerómetro de tres ejes y un giróscopo de tres ejes \cite{mpu6050}.
 
 En esta aplicación, las mediciones del acelerómetro y del giróscopo se
 utilizan para obtener una estimación del ángulo de inclinación de la barra.
@@ -347,18 +336,15 @@ serie, utilizada durante las pruebas y la adquisición de datos del sistema.
     \centering
     % Reemplazar por la imagen correspondiente
     \includegraphics[width=0.45\textwidth]{imagenes/arduino_nano.jpeg}
-    \caption{Arduino Nano utilizado para la adquisición, procesamiento
-    y control del sistema.}
+    \caption{Arduino Nano utilizado para la adquisición y el procesamiento de datos
+    y el control del sistema.}
     \label{fig:arduino_nano}
 \end{figure}
 
 
 \subsubsection{Potenciómetro}
 
-El sistema cuenta además con un potenciómetro utilizado para establecer
-manualmente la referencia de posición del móvil (fig. \ref{fig:potenciometro}). La tensión presente en
-su terminal central depende de la posición angular del mismo y es adquirida
-por una entrada analógica del Arduino Nano.
+El sistema cuenta además con un potenciómetro de 3/4 de vuelta de $10 \ \text{k}\Omega$ utilizado para establecer manualmente la referencia de posición del móvil (fig. \ref{fig:potenciometro}). La tensión presente en su terminal central depende de la posición angular del mismo y es adquirida por una entrada analógica del Arduino Nano.
 
 A partir de esta medición, el valor obtenido por el conversor
 analógico-digital del microcontrolador se transforma en una referencia de
@@ -367,7 +353,7 @@ posición válida para el sistema.
 \begin{figure}[H]
     \centering
     % Reemplazar por una fotografía del potenciómetro utilizado
-    \includegraphics[width=0.45\textwidth]{potenciometro}
+    \includegraphics[width=0.45\textwidth]{imagenes/foto_pote.jpeg}
     \caption{Potenciómetro utilizado para establecer la referencia de
     posición del sistema.}
     \label{fig:potenciometro}
@@ -377,7 +363,7 @@ posición válida para el sistema.
 
 \subsection{Potenciómetro}
 
-Para analizar la máxima resolución en la lectura del potenciómetro lo primero a considerar es que el conversor analógico digital (ADC) del Arduino Nano posee una resolución de 10 bits. Esto significa que el arduino posee $2^{10} = 1024$ valores distintos para representar la tensión medida en el potenciómetro, con lo cual dicha tensión será mapeada a un número entero entre $0$ y $1023$. Dado que el potenciómetro se alimenta de los $5$ V de referencia que provee el Arduino, la tensión de entrada estará entre $0$ y $5$ V, y por ende la máxima resolución en tensión alcanzable se puede calcular como:
+Para analizar la máxima resolución en la lectura del potenciómetro, lo primero que se debe considerar es que el conversor analógico-digital (ADC) del Arduino Nano posee una resolución de 10 bits. Esto significa que el Arduino posee $2^{10} = 1024$ valores distintos para representar la tensión medida en el potenciómetro, con lo cual dicha tensión será mapeada a un número entero entre $0$ y $1023$. Dado que el potenciómetro se alimenta de los $5$ V de referencia que provee el Arduino, la tensión de entrada estará entre $0$ y $5$ V, y, por ende, la máxima resolución en tensión alcanzable se puede calcular como:
 
 \begin{equation}
     \Delta V = \frac{5 \ \text{V}}{1024} \approx 4,88 \ \text{mV} 
@@ -389,15 +375,15 @@ Para obtener un valor de ángulo en grados a partir del potenciómetro, se debe 
     \theta = \frac{\theta_{max} - \theta_{min}}{x_{max} - x_{min}} \ x = \frac{180 \degree}{1023} \ x
 \end{equation}
 
-Donde $x$ representa la lectura obtenida del ADC, con $x \in [0, 1023]$.
+donde $x$ representa la lectura obtenida del ADC, con $x \in [0, 1023]$.
 
-Por ende se deduce que la resolución angular será:
+Por ende, se deduce de la expresión anterior que la resolución angular será:
 
 \begin{equation*}
-    \Delta \theta = \frac{180 \degree}{1024} \approx 0,176 \degree
+    \Delta \theta = \frac{180 \degree}{1023} \approx 0,176 \degree
 \end{equation*}
 
-En cuanto al tiempo de medición requerido, aquí entran en juego varios factores. En primer lugar se debe considerar el tiempo que necesita el ADC del Arduino para transformar el valor leído del potenciómetro a un número entre $0$ y $1023$. Luego hay que considerar que además ese valor debe ser multiplicado por una constante que está guardada en una variable de tipo \texttt{float}, lo cual agrega un tiempo de procesamiento extra debido a que se debe manejar aritmética de punto flotante. Teniendo en cuenta estos factores, se estimó experimentalmente el tiempo de medición utilizando el código que figura en la sección \ref{sec:codigo_pote} del apéndice, donde la medición arrojó un valor mínimo de $108 \ \mu$s y un máximo de $116 \ \mu$s, con lo cual:
+En cuanto al tiempo de medición requerido, aquí entran en juego varios factores. En primer lugar, se debe considerar el tiempo que necesita el ADC del Arduino para transformar el valor leído del potenciómetro a un número entre $0$ y $1023$. Luego, hay que considerar que ese valor, además, debe ser multiplicado por una constante que está guardada en una variable de tipo \texttt{float}, lo cual agrega un tiempo de procesamiento extra debido a que se debe manejar aritmética de punto flotante. Teniendo en cuenta estos factores, se estimó experimentalmente el tiempo de medición utilizando el código que figura en la sección \ref{sec:codigo_pote} del apéndice, donde la medición arrojó un valor mínimo de $108 \ \mu$s y un máximo de $116 \ \mu$s, con lo cual:
 
 \begin{equation*}
     \hat{t}_{med} \approx (112 \pm 4) \ \mu s
@@ -405,13 +391,13 @@ En cuanto al tiempo de medición requerido, aquí entran en juego varios factore
 
 \subsection{Sensor de distancia ultrasónico}
 
-A partir de la hoja de datos del sensor, se obtuvo que la máxima resolución en distancia es de $\Delta x = 0,3$ cm. Considerando que la velocidad del sonido en CNPT es $v_s = 343$ m/s, la máxima resolución temporal se obtiene como:
+A partir de la hoja de datos del sensor \cite{hcsr04}, se obtuvo que la máxima resolución en distancia es de $\Delta x = 0,3$ cm. Considerando que la velocidad del sonido en el aire en CNPT es $v_s \approx 343$ m/s, la máxima resolución temporal se obtiene como:
 
 \begin{equation*}
     \Delta t = 2 \frac{\Delta x}{v_s} \approx 17,49 \ \mu s
 \end{equation*}
 
-En cuanto al tiempo de medición, éste dependerá de la distancia a la que se encuentre el objeto, ya que la onda debe viajar hasta el carrito, rebotar en él, y volver hasta el sensor. Considerando que la barra mide $l \approx 35$ cm, se puede asegurar que el tiempo de medición será como mucho el tiempo que le tome a la onda el recorrer la barra completa ida y vuelta, por lo que:
+En cuanto al tiempo de medición, este dependerá de la distancia a la que se encuentre el objeto, ya que la onda debe viajar hasta el carrito, rebotar en él y volver hasta el sensor. Considerando que la barra mide $l \approx 35$ cm, se puede asegurar que el tiempo de medición será, como mucho, el tiempo que le tome a la onda recorrer la barra completa de ida y vuelta, por lo que:
 
 \begin{equation*}
     t_{max} = 2 \frac{l}{v_s} \approx 2,04 \ ms
@@ -419,112 +405,70 @@ En cuanto al tiempo de medición, éste dependerá de la distancia a la que se e
 
 \subsection{Unidad de medición inercial (IMU MPU6050)}
 
-En esta parte, se busca responder a la siguiente pregunta: ¿cual es el cambio de ángulo más chico que puede detectar la IMU? 
+En esta sección se analiza qué cambios de ángulo permite distinguir la IMU y cuánto tiempo lleva obtener una medición. Para este ensayo se usa solo el acelerómetro, que permite estimar la inclinación de la barra a partir de la gravedad cuando está quieta. El giróscopo mide velocidad angular y no se utiliza en este cálculo.
 
-La medición depende exclusivamente del acelerómetro triaxial interno, ya que el giróscopo únicamente registra velocidad angular y presenta una deriva temporal acumulativa al integrarse. 
+\subsubsection{Estimación de la resolución angular}
 
-Para medir la inclinación de la barra se utiliza la componente de la acelración de la gravedad sobre el eje longitudinal del acelerómetro (en el caso de este proyecto es $a_y$). El MPU6050 posee un ADC de $16\text{ bits}$ en complemento a 2 para cada eje (es decir, mide tanto números positivos como negativos), y permite configurar el acelerómetro en distintos rangos de medición. Con el objetivo de buscar la máxima sensibilidad del componente, se selecciona el rango más chico: $\pm 2g \text{AFS_SEL = 0}$.
-
-En esta configuración, la sensibilidad nominal indicada por el fabricante es de:
-
+El acelerómetro tiene un ADC de 16 bits por eje. Se seleccionó el rango de $\pm2g$ para obtener la mayor sensibilidad, de $16\,384$ unidades digitales por $g$ \cite{mpu6050}. Por lo tanto, el paso mínimo de aceleración es:
 \begin{equation*}
-    S = 16,384\ \frac{\text{LSB}}{g}
+    \Delta a = \frac{g}{16\,384}.
 \end{equation*}
 
-Esto significa que una variación de una unidad en la salida digital del sensor corresponde a aproximadamente:
-
+En este montaje, la componente de la gravedad sobre el eje longitudinal es $a_y=g\sin(\theta)$. Cerca de la posición horizontal, $\sin(\theta)\approx\theta$, con el ángulo en radianes, de modo que $a_y\approx g\theta$. El paso angular ideal resulta:
 \begin{equation*}
-    \Delta a = \frac{1}{16,384}g
+    \Delta\theta \approx \frac{1}{16\,384}\text{ rad}
+    \approx 0{,}0035^\circ.
 \end{equation*}
 
-Por otro lado, si la barra forma un ángulo $\theta$ con la horizontal, la componente de la gravedad sobre el eje longitudinal puede expresarse como:
-
+Este valor considera únicamente los pasos del ADC. En la práctica, el ruido hace que la lectura cambie incluso con la barra quieta. Con una densidad de ruido aproximada de $400\,\mu g/\sqrt{\text{Hz}}$ y un ancho de banda de $\SI{44}{\hertz}$, se estima un ruido RMS (valor eficaz) de:
 \begin{equation*}
-    a_y = g\sin(\theta)
+    a_{\text{ruido,RMS}}\approx
+    400\,\mu g/\sqrt{\text{Hz}}\cdot\sqrt{44\,\text{Hz}}
+    \approx 2{,}65\,\text{m}g.
+\end{equation*}
+Cerca de la horizontal, esto equivale a un ruido angular de aproximadamente $0{,}15^\circ$. Por eso, la capacidad de distinguir pequeños cambios de ángulo queda limitada principalmente por el ruido y no por el paso del ADC.
+
+\subsubsection{Resultados medidos y comparación}
+
+Se registraron 2000 mediciones durante aproximadamente 20 segundos con la IMU quieta, luego de una espera inicial de 3 segundos. Se usó un período de muestreo de $\SI{10}{\milli\second}$ ($\SI{100}{\hertz}$), el rango de $\pm2g$, el filtro interno a $\SI{44}{\hertz}$ y el bus I$^2$C a $\SI{400}{\kilo\hertz}$. El ángulo se calculó con las tres componentes del acelerómetro, sin filtro complementario:
+\begin{equation*}
+    \theta_{\mathrm{acc}} = \operatorname{atan2}\!\left(a_y,\sqrt{a_x^2+a_z^2}\right)\frac{180^\circ}{\pi}.
+\end{equation*}
+Este cálculo supone que la aceleración medida se debe principalmente a la gravedad.
+
+El ángulo medio fue de $-0{,}595404^\circ$, con una desviación estándar de $0{,}089478^\circ$ y una variación pico a pico de $0{,}681978^\circ$. La desviación estándar describe cuánto fluctúan las lecturas alrededor del promedio y permite comparar el ruido medido con el estimado. El valor medio, por sí solo, no indica el error del sensor: para conocerlo haría falta una referencia angular independiente.
+
+Como criterio orientativo para la resolución práctica se tomó tres veces la desviación estándar:
+\begin{equation*}
+    \Delta\theta_{\text{práctica}} = 3\sigma \approx 0{,}268^\circ.
 \end{equation*}
 
-Para ángulos chicos, $\sin(\theta)\approx\theta$ (teniendo en cuenta que el ángulo tiene que estar expresado en radianes), por lo que:
 
-\begin{equation*}
-    $a_x\approx g\theta$
-\end{equation*}
+Para evaluar cuánto tiempo ocupa la obtención del ángulo dentro de un ciclo de control, se midieron juntas la lectura de la IMU y el cálculo del ángulo. Se utilizó \texttt{micros()}, desde antes de llamar a \texttt{getEvent()} hasta obtener el ángulo en grados. El promedio fue de $\SI{1613,55}{\micro\second}$, con valores entre $\SI{1580}{\micro\second}$ y $\SI{1628}{\micro\second}$. No se incluyeron la espera inicial, el cálculo de estadísticas ni la impresión por puerto serie. Este resultado corresponde al tiempo de lectura y cálculo en el Arduino, no al retardo interno del sensor.
 
-De esta manera, considerando únicamente la resolución del ADC, el camino mínimo de ángulo que podría detectarse sería de aproximadamente:
+A una frecuencia de control de $\SI{100}{\hertz}$, cada ciclo dispone de $\SI{10}{\milli\second}$. El mayor tiempo observado de lectura y cálculo fue de $\SI{1,628}{\milli\second}$, aproximadamente el $16{,}3\,\%$ del período, dejando unos $\SI{8,37}{\milli\second}$ para las demás tareas. En las condiciones del ensayo, esta parte del programa cabe dentro del período previsto. Para confirmar que el sistema completo puede ejecutarse a $\SI{100}{\hertz}$, habrá que verificar también el tiempo de los otros sensores, el filtro, el controlador y cualquier comunicación utilizada.
 
-\begin{equation*}
-    \Delta\theta \approx \frac{1}{16,384}\text{ rad}
-    \approx 0{,}0035^\circ
-\end{equation*}
+La tabla \ref{tab:imu_comparacion} resume las estimaciones angulares y los resultados medidos. El ruido medido fue menor que el estimado, aunque del mismo orden de magnitud.
 
-Sin embargo, este valor representa solamente la resolución teórica del sistema y no la resolución real de la medición. El acelerómetro presenta un nivel de ruido propio que limita la capacidad de detectar cambios tan chicos. Para una densidad de ruido de aproximadamente $400\mu g/\sqrt{\text{Hz}}$ (densidad espectral de ruido, es una forma de decir qué tan grande es ese ruido por unidad de ancho de banda) y un ancho de banda de $\SI{44}{\hertz}$, el ruido RMS estimado es del orden de $2{,}65\text{m}g$.
-
-Este valor es considerablemente mayor que la variación correspondiente a un solo LSB del ADC y equivale, cerca de la posición horizontal, a una variación angular del orden de:
-
-\begin{equation*}
-    \Delta\theta_{\text{ruido}}\approx 0{,}15^\circ
-\end{equation*}
-
-Por lo tanto, aunque el ADC presenta una resolución teórica de aproximadamente $0{,}0035^\circ$, la resolución angular efectiva estará principalmente limitada por el ruido del acelerómetro. Esta resolución puede mejorarse mediante promediado de las mediciones o mediante un filtrado adicional en el microcontrolador.
-
-Por otro lado, el tiempo necesario para obtener una muestra de la IMU depende, entre otros factores, de la velocidad de comunicación del bus I$^2$C. Para calcular el tiempo mínimo de transferencia, se considera la lectura de los ejes del acelerómetro, lo que requiere obtener $6 \text{bytes}$ de datos.
-
-Mediante una \textit{burst read}, se comienza indicando al MPU6050 la dirección del primer registro del acelerómetro, \texttt{ACCEL_XOUT_H} (\texttt{0x3B}), y luego se leen consecutivamente a los ejes $X$, $Y$ y $Z$.
-
-La cantidad de pulsos de reloj del bus necesarios para la lectura principal puede estimarse considerando:
-
-\begin{itemize}
-    \item Dirección del dispositivo en modo escritura + ACK: $9$ ciclos.
-    \item Dirección del registro inicial + ACK: $9$ ciclos.
-    \item Dirección del dispositivo en modo lectura + ACK: $9$ ciclos.
-    \item Lectura de 14 bytes, incluyendo los bits de ACK/NACK: $14\times9=126$ ciclos.
-\end{itemize}
-
-Por lo tanto, la lectura principal requiere:
-
-\begin{equation*}
-N_{14\text{ bytes}} = 9+9+9+126=153
-\end{equation*}
-
-Cada lectura adicional de un registro de un byte requiere $9+9+9+9=36$ pulsos. En consecuencia, para las tres transacciones realizadas por la biblioteca:
-
-\begin{equation*}
-N_{\text{total}} = 153 + 2\times36 = 225
-\end{equation*}
-
-Las condiciones de START, repeated START y STOP imponen tiempos adicionales, pero no se cuentan como un pulso de datos fijo. Para una velocidad de bus configurada de $400\,\text{kHz}$, correspondiente al modo rápido de I$^2$C utilizado en el ensayo, el período de cada ciclo es:
-
-\begin{equation*}
-T_{\text{I}^2\text{C}}=
-\frac{1}{400\,000\,\text{Hz}}
-=2{,}5\,\mu\text{s}
-\end{equation*}
-
-Por lo tanto, el tiempo teórico de transferencia resulta:
-
-\begin{equation*}
-t_{\text{bus}}=
-N_{\text{total}}T_{\text{I}^2\text{C}}
-=225\times2{,}5\,\mu\text{s}
-=562{,}5\,\mu\text{s}
-\end{equation*}
-
-Este valor representa únicamente una estimación del tiempo ocupado por los pulsos de reloj de las transferencias I$^2$C. El tiempo total de medición incluye además los tiempos entre transacciones, la ejecución de la biblioteca, las conversiones de unidades y el cálculo trigonométrico del ángulo. Por este motivo, se determinará experimentalmente midiendo con \texttt{micros()} desde antes de llamar a \texttt{getEvent()} hasta obtener el ángulo en grados, sin incluir la impresión por puerto serie dentro del intervalo cronometrado.
-
-Finalmente, debe distinguirse el tiempo de comunicación del tiempo de actualización de los datos dentro del MPU6050. La frecuencia de actualización del acelerómetro establece cada cuánto tiempo se dispone de una nueva muestra, mientras que el cálculo anterior determina cuánto tiempo demanda transferir una muestra ya disponible desde el sensor hacia el microcontrolador.
-
-El envío posterior a MATLAB constituye otra etapa: los datos adquiridos por I$^2$C se procesan en Arduino y luego se transmiten a la computadora por el puerto serie, configurado a $115\,200$ bit/s. Los bytes transmitidos dependen de la trama del programa; por ejemplo, en la adquisición de seis componentes de la Práctica 2 se envían $4 \text{bytes}$ de cabecera (\texttt{abcd}) y seis valores \texttt{float} de $4 \text{bytes}$, es decir, $28 \text{bytes}$ por trama. Con formato 8-N-1 se transmiten 10 bits por byte, por lo que esa trama requiere nominalmente $28\times10/115\,200\approx2{,}43$ ms sobre el enlace serie. Este tiempo no forma parte de la lectura I$^2$C ni representa por sí solo la latencia hasta que MATLAB recibe y procesa los datos. Las tramas de ángulos de la Práctica 3 tienen otro tamaño, según las variables enviadas.
-
-Para evaluar el funcionamiento en reposo se registraron 2000 mediciones durante aproximadamente 20 segundos, manteniendo fija la IMU. Se utilizó el filtro complementario con $\alpha=0{,}92$, un período de muestreo programado de $\SI{10}{\milli\second}$ ($\SI{100}{\hertz}$), rango del acelerómetro de $\pm2g$ y comunicación I$^2$C a $SI{400}{\kilo\hertz}$. Antes del registro se calibró el giróscopo mediante el promedio de 500 lecturas en reposo y se dejó funcionar el filtro durante 3 segundos para descartar el transitorio inicial.
-
-El ángulo complementario presentó un valor medio de $-0{,}275867^\circ$, una desviación estándar de $0{,}016850^\circ$ y una variación pico a pico de $0{,}109921^\circ$. Esto indica que, aún con la barra quieta, el ángulo estimado presenta pequeñas fluctuaciones alrededor de su valor medio.
-
-Tomando tres veces la desviación estándar como criterio de resolución práctica estimada, se obtiene:
-\begin{equation*}
-    \Delta\theta_{\text{práctica}} = 3\sigma \approx 0{,}050549^\circ \approx 0{,}051^\circ.
-\end{equation*}
-Este valor es mayor que el paso de cuantización ideal de $0{,}0035^\circ$ y caracteriza el nivel de ruido de la estimación filtrada en las condiciones del ensayo. La dispersión medida es menor que la estimación de ruido del acelerómetro presentada anteriormente, pero corresponden a señales distintas: aquí se evalúa la salida del filtro complementario. El criterio de $3\sigma$ es orientativo y no constituye una verificación de exactitud ni garantiza la detección de cambios de ese tamaño; para comprobarlo sería necesario realizar ensayos con variaciones angulares conocidas.
-
-En el ensayo previo se obtuvo un tiempo promedio de lectura con Adafruit y cálculo del filtro complementario de $\SI{1,723}{\milli\second}$. Con valores observados entre $1{,}572$ y $\SI{1,748}{\milli\second}$. Este tiempo es mayor que la estimación del bus I$^2$C porque incluye también la ejecución del programa y el procesamiento de los datos. No incluye la calibración inicial ni el envío posterior a MATLAB.
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{@{}p{0.28\linewidth}p{0.29\linewidth}p{0.35\linewidth}@{}}
+        \toprule
+        Magnitud & Estimación & Resultado experimental \\
+        \midrule
+        Paso angular ideal del ADC & $0{,}0035^\circ$ & No se midió por separado. \\
+        \addlinespace
+        Ruido angular (RMS o $\sigma$) & $0{,}15^\circ$ & $0{,}0895^\circ$ \\
+        \addlinespace
+        Criterio angular de $3\sigma$ & $0{,}45^\circ$ (tres veces el ruido estimado) & $0{,}268^\circ$ (tres veces el ruido medido) \\
+        \addlinespace
+        Tiempo de lectura y cálculo del ángulo & --- & $\SI{1,614}{\milli\second}$ en promedio (lectura y cálculo del ángulo); rango: $1{,}580$--$\SI{1,628}{\milli\second}$. \\
+        \bottomrule
+    \end{tabular}
+    \caption{Estimaciones angulares y mediciones de la IMU en reposo. El tiempo incluye la lectura y el cálculo del ángulo; el criterio de $3\sigma$ es orientativo.}
+    \label{tab:imu_comparacion}
+\end{table}
 
 \section{Limitaciones de los actuadores}
 
@@ -545,7 +489,7 @@ Para estudiar el comportamiento del actuador en la implementación planteada,
 se realizó una prueba experimental variando el ancho del pulso aplicado al
 servomotor. Se encontró que el rango de funcionamiento utilizado por la
 planta se encuentra aproximadamente entre $550\,\mu s$ y $1600\,\mu s$.
-Para valores inferiores no se observaron variaciones adicionales apreciables en la inclinación de la barra. Mientras que para valores superiores a este límite, la barra comenzaba a inclinarse nuevamente en sentido contrario.
+Para valores inferiores al límite mínimo, no se observaron variaciones adicionales apreciables en la inclinación de la barra, mientras que, para valores superiores al límite máximo, la barra comenzaba a inclinarse nuevamente en sentido contrario.
 
 Tomando como referencia la posición horizontal de la barra, se obtuvo
 experimentalmente que un ancho de pulso de $900\,\mu s$ corresponde a un
@@ -610,7 +554,7 @@ real depende del servo y de la mecánica utilizada.
 
 Además de la resolución teórica, se analizó experimentalmente cuál es la
 mínima variación del ancho de pulso que produce un movimiento observable
-en la barra. Se encontró que variaciones del ancho de pulso de aproximadamente $5 \ \mu s$ ya producían desplazamientos (cómo especificaba el fabricante) apreciables de la barra. Por ejemplo, partiendo de un pulso de $900 \ \mu s$, tanto un incremento hasta $905 \ \mu s$ como una disminución hasta $895 \ \mu s$ generaban una variación observable en la inclinación. Por lo tanto, para la implementación planteada se considera una variación
+en la barra. Se encontró que variaciones del ancho de pulso de aproximadamente $5 \ \mu s$ ya producían desplazamientos apreciables de la barra, como especificaba el fabricante. Por ejemplo, partiendo de un pulso de $900 \ \mu s$, tanto un incremento hasta $905 \ \mu s$ como una disminución hasta $895 \ \mu s$ generaban una variación observable en la inclinación. Por lo tanto, para la implementación planteada se considera una variación
 mínima observable de:
 
 \begin{equation*}
@@ -688,11 +632,9 @@ p(\theta_b)=
 900+\displaystyle\frac{700}{22.3}\theta_b, & 0<\theta_b\leq22.3.
 \end{cases}
 \end{equation}
-Este modelo estima el ángulo de la barra, no el del eje del servo, y no
-debe extrapolarse fuera del intervalo ensayado. Las pendientes son promedios
-de cada tramo; para caracterizar la no linealidad y la histéresis harían falta
-más puntos, medidos en ambos sentidos. El ancho de pulso determina la
-consigna: no es el tiempo durante el cual se mueve el motor.
+Este modelo estima el ángulo de la barra y no se extrapola fuera del intervalo ensayado. Las pendientes son promedios
+de cada tramo. El ancho de pulso determina la
+consigna.
 
 \subsubsection{Tiempo estimado y medido para un desplazamiento de $30^\circ$}
 
@@ -707,24 +649,14 @@ de $30^\circ$ en el eje del servo se estima como:
 70\,ms, & V=6\,V.
 \end{cases}
 \end{equation}
-Son estimaciones nominales, no mediciones del sistema montado ni tiempos
-de establecimiento garantizados. La carga, la aceleración, el frenado y la
-tensión de alimentación pueden modificar el resultado. No se conoce aquí
-la tensión efectiva del ensayo, por lo que se conservan ambos casos.
 
 La biblioteca \texttt{Servo} mantiene un intervalo de refresco nominal de
 $20\,ms$ \cite{arduino_servo}. Una orden puede esperar aproximadamente
-entre $0$ y $20\,ms$ hasta el siguiente pulso; sumando sólo esa espera al
+entre $0$ y $20\,ms$ hasta el siguiente pulso; sumando solo esa espera al
 recorrido nominal se obtienen $85$--$105\,ms$ a $4.8\,V$ y
 $70$--$90\,ms$ a $6\,V$, sin incluir otros retardos internos.
 
-Si los $30^\circ$ se refieren a la barra, estos tiempos no pueden aplicarse
-directamente: falta la relación cinemática entre el eje y la barra. Por
-ejemplo, pasar de $-10^\circ$ a $20^\circ$ en la barra corresponde, según el
-mapeo, a pasar aproximadamente de $664$ a $1528\,\mu s$, pero eso no
-determina el giro del eje.
-Cronometrar únicamente \texttt{writeMicroseconds()} mide la actualización
-de la consigna, no el movimiento mecánico.
+Cabe destacar que este cálculo constituye una aproximación, ya que la IMU utilizada para medir el desplazamiento angular se encuentra ligeramente desplazada respecto del eje de rotación de la barra. Por lo tanto, el tiempo obtenido representa una estimación del tiempo requerido para que la barra realice un desplazamiento de $30^\circ$.
 
 Para medir la respuesta del sistema montado, se realizó este desplazamiento
 de $-10^\circ$ a $20^\circ$ de la barra mediante el programa
@@ -736,16 +668,8 @@ En el ensayo se obtuvo:
 \begin{equation*}
 t_{\text{llegada, barra}} = 391{,}9\,ms \approx 0{,}39\,s.
 \end{equation*}
-La llegada se confirmó a los $491{,}9\,ms$, con una lectura de
-$20{,}56^\circ$; los $100\,ms$ de confirmación no se suman al tiempo de
-llegada informado. Este resultado corresponde a un único ensayo e incluye
-la espera de aplicación del comando, la respuesta mecánica del conjunto
-y los retardos de la IMU y del filtro. El muestreo de $10\,ms$ limita la
-resolución temporal, aunque el programa muestre décimas de milisegundo.
-Por tratarse de un desplazamiento de la barra, el valor medido no permite
-validar directamente los $70$--$85\,ms$ estimados para $30^\circ$ del eje
-del servo, ni garantiza que la barra permanezca en la banda después del
-intervalo observado.
+
+Este resultado corresponde a un único ensayo y debe considerarse como una estimación, ya que la medición está limitada por el período de muestreo de la IMU, de $10,ms$.
 
 \subsubsection{Efecto de una frecuencia de control de $1\,Hz$}
 
@@ -771,10 +695,11 @@ actualizaciones, aunque el servo complete antes su movimiento.
 Si también se adquieren los sensores a $1\,Hz$, sus pasos de cuantización
 y tiempos por lectura no cambian, pero se pierde información de la
 evolución entre muestras; la frecuencia de Nyquist pasa a $0.5\,Hz$.
-Las cifras de ruido del filtro complementario obtenidas a $100\,Hz$ no
-pueden trasladarse sin más a esa condición: habría que ajustar el filtro
-y repetir el ensayo. Es posible mantener la IMU a $100\,Hz$ y actualizar
-sólo la consigna a $1\,Hz$, como permite el código del apéndice
+Las cifras de ruido del ángulo del acelerómetro obtenidas a $100\,Hz$ no
+caracterizan por sí solas el comportamiento dinámico a $1\,Hz$. Si se utiliza
+un filtro complementario, también debe ajustarse al nuevo período de muestreo
+y evaluarse en esa condición. Es posible mantener la IMU a $100\,Hz$ y actualizar
+solo la consigna a $1\,Hz$, como permite el código del apéndice
 \ref{sec:codigo_servo}.
 
 Si, en cambio, se pretende emitir los propios pulsos del servo a $1\,Hz$,
@@ -785,23 +710,23 @@ conservar el ciclo de trabajo al cambiar el período, porque eso alteraría
 el ancho del pulso y, por lo tanto, la consigna.
 
 \section{Limitaciones adicionales}
-Para analizar las limitaciones presentes en el envío de datos, en esta sección se analiza el tiempo requerido para el envío de $100$ \texttt{floats} a través del puerto serie de Arduino, a una velocidad de $115200$ bps.
+Para analizar las limitaciones presentes en el envío de datos, en esta sección se estudia el tiempo requerido para transmitir $100$ \texttt{floats} a través del puerto serie de Arduino, a una velocidad de $115200$ bps.
 
-Dado que cada float ocupa $32$ \texttt{bits} en memoria, a la velocidad mencionada, el tiempo requerido para enviar un único float se calcula como:
+Dado que cada \texttt{float} ocupa $32$ \texttt{bits} en memoria, a la velocidad mencionada, el tiempo requerido para enviar un único \texttt{float} se calcula como:
 
 \begin{equation}
     t_{float} = \frac{32}{115200} \approx 277,78 \ \mu s
 \end{equation}
 
-Por lo que en teoría el tiempo requerido para enviar los $100$ \texttt{floats} a través del puerto serie sería de aproximadamente $t_{100\_floats} \approx 27,78$ ms. Para corroborar este valor se midió dicho tiempo experimentalmente utilizado el código que se encuentra en la sección \ref{sec:codigo_100_floats} del apéndice. De la medición se obtuvo un valor de:
+Por lo tanto, en teoría, el tiempo requerido para enviar los $100$ \texttt{floats} a través del puerto serie sería de aproximadamente $t_{100\_floats} \approx 27,78$ ms. Para corroborar este valor, se midió dicho tiempo experimentalmente utilizando el código que se encuentra en la sección \ref{sec:codigo_100_floats} del apéndice. De la medición se obtuvo un valor de:
 
 \begin{equation}
     \hat{t}_{100\_floats} \approx 36 \ ms
 \end{equation}
 
-El cual muestra una correspondencia adecuada con el valor calculado de manera teórica. De esta medición se puede obtener además que $\hat{t}_{float} \approx 360 \ \mu$s. No sería recomendable medir el tiempo que tarda un único \texttt{float} en ser enviado directamente ya que eso arrojaría mediciones con un alto grado de error dado que se estaría superarando la propia resolución de la función \texttt{micros()}, que es de $4 \ \mu$s.
+Este resultado muestra una correspondencia adecuada con el valor calculado de manera teórica. De esta medición se puede obtener además que $\hat{t}_{float} \approx 360 \ \mu$s. No sería recomendable medir el tiempo que tarda un único \texttt{float} en ser enviado directamente, ya que eso arrojaría mediciones con un alto grado de error, dado que se estaría superando la propia resolución de la función \texttt{micros()}, que es de $4 \ \mu$s.
 
-Por otro lado, cabe aclarar que la transmisión de datos en el Arduino se da de manera \textit{asincrónica}. El método \texttt{Serial.write()} únicamente se encarga de escribir los datos en el buffer de transmisión. Luego dicho buffer se vacía llamando al método \texttt{Serial.flush()}, enviando así los datos a través del puerto serie. Por ello en el código utilizado se tuvo en cuenta tanto el tiempo de escritura como lo que tarda el buffer en vaciarse para considerar que los datos fueron efectivamente enviados.
+Por otro lado, cabe aclarar que la transmisión de datos en el Arduino se da de manera \textit{asincrónica}. El método \texttt{Serial.write()} únicamente se encarga de escribir los datos en el búfer de transmisión. Luego, dicho búfer se vacía llamando al método \texttt{Serial.flush()}, enviando así los datos a través del puerto serie. Por ello, en el código utilizado se tuvo en cuenta tanto el tiempo de escritura como lo que tarda el búfer en vaciarse para considerar que los datos fueron efectivamente enviados.
 
 \begin{thebibliography}{9}
 
@@ -834,13 +759,36 @@ Arduino,
 \textit{Biblioteca Servo: Servo.h, REFRESH\_INTERVAL},
 \url{https://github.com/arduino-libraries/Servo/blob/master/src/Servo.h}.
 
+\bibitem{filtro_complementario}
+Mario Garcia,
+\textit{Complementary Filter}, documentación de AHRS,
+\url{https://ahrs.readthedocs.io/en/latest/filters/complementary.html}.
+
 \end{thebibliography}
 
 \newpage
 
 \section{Apéndice}
 
-\setcounter{section}{1}
+\subsection{Filtro complementario para estimar el ángulo}
+\label{sec:filtro_complementario}
+
+Para medir el ángulo de la barra se utilizará un filtro complementario,
+que combina el acelerómetro y el giróscopo de la IMU. El acelerómetro
+estima la inclinación a partir de la gravedad y aporta la información de
+bajas frecuencias (cambios lentos), pero es sensible a las vibraciones y
+a las aceleraciones del movimiento. Su sesgo, es decir, un desplazamiento
+constante en la lectura, también puede producir un error en el ángulo.
+El giróscopo mide la velocidad angular y permite seguir los cambios
+rápidos (altas frecuencias), pero al integrarla para obtener el ángulo,
+su sesgo acumula un error que crece con el tiempo, llamado deriva.
+
+El filtro combina la parte de bajas frecuencias del ángulo del
+acelerómetro con la de altas frecuencias del ángulo obtenido del
+giróscopo. Así se reducen las fluctuaciones del acelerómetro y la deriva
+del giróscopo, obteniendo una estimación más estable
+\cite{filtro_complementario}. Esto no elimina el sesgo del acelerómetro,
+por lo que sigue siendo necesario calibrar los sensores.
 
 \subsection{Código utilizado para estimar el tiempo de medición del potenciómetro} \label{sec:codigo_pote}
 \lstinputlisting[language=C++]{codigos/t_med_pote.ino}
@@ -863,6 +811,6 @@ cada $20\,ms$ con actualizaciones cada $1\,s$; los pulsos siguen siendo
 generados por \texttt{Servo}. Si llegan varias consignas dentro de un
 período, se aplica la última. También se incluye la función inversa para
 obtener el ancho de pulso a partir de un ángulo de barra.
-\lstinputlisting[language=C++]{../codigo/servo_mapeo/servo_mapeo.ino}
+\lstinputlisting[language=C++]{codigos/servo_mapeo.ino}
 
 \end{document}

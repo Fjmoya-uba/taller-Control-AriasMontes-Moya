@@ -8,7 +8,7 @@ Servo miServo;
 Adafruit_MPU6050 mpu;
 
 const byte PIN_SERVO = 9;
-NEW SKETCH
+//NEW SKETCH;
 
 const unsigned long SERIAL_BAUD = 115200;
 const unsigned long PERIODO_IMU_US = 10000;  // 100 Hz
@@ -55,8 +55,8 @@ void responderComando(const char *texto) {
   miServo.writeMicroseconds((int)anchoPulso);
   Serial.print("Pulso_us: ");
   Serial.print(anchoPulso);
-  Serial.print(", Angulo_deg: ");
-  Serial.println(angulo, 2);
+  //Serial.print(", Angulo_deg: ");
+  //Serial.println(angulo, 2);
 }
 
 void leerPuertoSerie() {
