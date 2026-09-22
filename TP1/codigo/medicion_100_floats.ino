@@ -23,4 +23,6 @@ void loop() {
   Serial.println("");
   Serial.print("Tiempo de envio total: ");
   Serial.println(t1);
+  t1 = micros();
+  delayMicroseconds(20000 - t1);
 }
