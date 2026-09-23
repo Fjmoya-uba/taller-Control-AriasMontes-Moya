@@ -721,10 +721,10 @@ Dado que cada \texttt{float} ocupa $32$ \texttt{bits} en memoria, a la velocidad
 Por lo tanto, en teoría, el tiempo requerido para enviar los $100$ \texttt{floats} a través del puerto serie sería de aproximadamente $t_{100\_floats} \approx 27,78$ ms. Para corroborar este valor, se midió dicho tiempo experimentalmente utilizando el código que se encuentra en la sección \ref{sec:codigo_100_floats} del apéndice. De la medición se obtuvo un valor de:
 
 \begin{equation}
-    \hat{t}_{100\_floats} \approx 36 \ ms
+    \hat{t}_{100\_floats} \approx 35 \ ms
 \end{equation}
 
-Este resultado muestra una correspondencia adecuada con el valor calculado de manera teórica. De esta medición se puede obtener además que $\hat{t}_{float} \approx 360 \ \mu$s. No sería recomendable medir el tiempo que tarda un único \texttt{float} en ser enviado directamente, ya que eso arrojaría mediciones con un alto grado de error, dado que se estaría superando la propia resolución de la función \texttt{micros()}, que es de $4 \ \mu$s.
+Este resultado muestra una correspondencia adecuada con el valor calculado de manera teórica. De esta medición se puede obtener además que $\hat{t}_{float} \approx 350 \ \mu$s. No sería recomendable medir el tiempo que tarda un único \texttt{float} en ser enviado directamente, ya que eso arrojaría mediciones con un alto grado de error, dado que se estaría superando la propia resolución de la función \texttt{micros()}, que es de $4 \ \mu$s.
 
 Por otro lado, cabe aclarar que la transmisión de datos en el Arduino se da de manera \textit{asincrónica}. El método \texttt{Serial.write()} únicamente se encarga de escribir los datos en el búfer de transmisión. Luego, dicho búfer se vacía llamando al método \texttt{Serial.flush()}, enviando así los datos a través del puerto serie. Por ello, en el código utilizado se tuvo en cuenta tanto el tiempo de escritura como lo que tarda el búfer en vaciarse para considerar que los datos fueron efectivamente enviados.
 

@@ -1,0 +1,47 @@
+%% Ejecutar primero estimar-planta.m para tener G, Gz, u0 e y0.
+% Este script no modifica la identificacion. Requiere Control System Toolbox.
+assert(exist('G','var') == 1, 'Ejecutar primero estimar-planta.m');
+
+%% Parametros para modificar
+Ts_control = 0.02;            % 50 Hz, igual que en Arduino
+wc = 1;                       % Frecuencia objetivo [rad/s], inicio lento
+C = pidtune(G, 'PI', wc);      % O reemplazar por: C = pid(Kp, Ki);
+Cd = c2d(C, Ts_control, 'tustin');
+
+% Para simular el comando mantenido entre muestras se usa ZOH en la planta.
+% Lo exigido por el metodo bilineal esta en Cd, no en esta conversion.
+Gd = c2d(G, Ts_control, 'zoh');
+T = feedback(Gd*Cd, 1);
+Sd = feedback(1, Gd*Cd);       % Perturbacion ADITIVA a la salida
+assert(isstable(T), 'El lazo nominal discreto no es estable');
+% Verificar tambien el modelo identificado directamente, si tiene el mismo Ts.
+if exist('Gz','var') && abs(Gz.Ts-Ts_control) < 1e-5
+    assert(isstable(feedback(Gz*Cd,1)), 'Lazo inestable con Gz identificado');
+end
+
+disp('Controlador continuo:'); C
+disp('Controlador bilineal:'); Cd
+fprintf('\nCopiar al Arduino (ganancias con su signo):\n');
+fprintf('const float KP = %.9gf;\n', C.Kp);
+fprintf('const float KI = %.9gf;\n', C.Ki);
+fprintf('const float U0_US = %.9gf;\n', u0);
+fprintf('Punto de trabajo medido: y0 = %.4f grados\n', y0);
+fprintf('Ts_control = %.6f s\n', Ts_control);
+
+%% Ensayo lineal: referencia +2 grados y perturbacion +5 grados a los 15 s.
+% Son VARIACIONES respecto de y0/u0. No incluye saturacion ni geometria
+% de la inclinacion: no reemplaza el ensayo sobre el mecanismo.
+tc = (0:Ts_control:40)';
+r = 2*ones(size(tc));
+d = 5*(tc >= 15);
+yc = lsim(T, r, tc) + lsim(Sd, d, tc);
+uc = u0 + lsim(feedback(Cd,Gd), r-d, tc);
+figure('Name','PI bilineal: ensayo nominal');
+subplot(2,1,1); plot(tc,r, '--', tc,yc); grid on;
+ylabel('Variacion de angulo [grados]'); legend('Referencia','Salida');
+subplot(2,1,2); plot(tc,uc); grid on;
+yline(700,'--'); yline(1100,'--');
+ylabel('Servo [us]'); xlabel('Tiempo [s]');
+if any(uc < 700 | uc > 1100)
+    warning('El ensayo pide pulsos fuera de 700..1100 us: la simulacion lineal no representa la saturacion.');
+end
