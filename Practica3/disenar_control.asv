@@ -4,14 +4,10 @@ assert(exist('G','var') == 1, 'Ejecutar primero estimar-planta.m');
 
 %% Parametros para modificar
 Ts_control = 0.02;            % 50 Hz, igual que en Arduino
-
-p = [];
-z = [];
-K = 10;
-C = zpk(z, p, K);    
-C
+wc = 1;                       % Frecuencia objetivo [rad/s], inicio lento
+C = pidtune(G, 'PI', wc);      % O reemplazar por: C = pid(Kp, Ki);
 Cd = c2d(C, Ts_control, 'tustin');
-
+Cd
 %%
 % Para simular el comando mantenido entre muestras se usa ZOH en la planta.
 % Lo exigido por el metodo bilineal esta en Cd, no en esta conversion.

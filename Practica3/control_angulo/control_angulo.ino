@@ -14,11 +14,11 @@ const byte PIN_SERVO = 9;
 const unsigned long TS_US = 20000UL;
 const float TS = TS_US * 1e-6f;
 // Copiar KP, KI y U0_US desde disenar_control.m antes del ensayo.
-const float KP = 0.0f;          // us/grado
-const float KI = 0.0f;          // us/(grado*s)
+const float KP = 50.0f;          // us/grado
+const float KI = 200.0f;          // us/(grado*s)
 const float U0_US = 900.0f;     // Pulso de equilibrio
-const float UMIN_US = 700.0f;   // Rango usado para identificar
-const float UMAX_US = 1100.0f;
+const float UMIN_US = 550.0f;   // Rango usado para identificar
+const float UMAX_US = 1600.0f;
 const float REFERENCIA_MIN = -10.0f;
 const float REFERENCIA_MAX = 10.0f;
 const float CERO_IMU = 0.0f;    // Lectura de IMU con barra horizontal
