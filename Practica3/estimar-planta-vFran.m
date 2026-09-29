@@ -44,8 +44,7 @@ Gz
 
 %% 4. Planta continua con la forma pedida
 % z = exp(-p*Ts) => p = -log(z)/Ts. Los polos continuos son -p1 y -p2.
-% Conservamos polos y ganancia DC. NO es una conversion ZOH exacta:
-% tambien hay que validar G(s) contra las mediciones.
+% Conservamos polos y ganancia DC. 
 p = -log(z_polos)/Ts;
 den = [1, sum(p), prod(p)];
 
@@ -62,7 +61,6 @@ G
 %% 5. Simulacion libre y validacion en el tramo reservado
 % Estado inicial cero en variables centradas para ambos modelos.
 % Simulamos desde el inicio para llegar al corte con historia de entrada.
-% No usamos salidas medidas para corregir la simulacion.
 y_dis = lsim(Gz, du, t_sim)+y0;
 y_cont = lsim(G, du, t_sim, [], 'zoh')+y0;
 k_val = (n_est+1:N)';
@@ -78,12 +76,22 @@ fprintf('G(z): RMSE = %.6g | FIT = %.2f %%\n', rmse(1), fit(1));
 fprintf('G(s): RMSE = %.6g | FIT = %.2f %%\n', rmse(2), fit(2));
 
 %% 6. Graficos
-figure('Name', 'Identificacion y validacion de dos polos');
+figure('Name', 'Validación de la Planta Contínua G(s)');
+
+% Grafico superior
 subplot(2,1,1);
-plot(t,y,'b', t,y_cont,'g-.'); grid on;
-xline(t(n_est+1),'--','HandleVisibility','off');
-ylabel('Salida y'); legend('Medida','G(s)','Location','best');
+plot(t, y, 'b', y_cont, 'g-', 'LineWitdh', 1.2); grid on;
+xline(t(n_est+1), '--r', 'Inicio Validación', 'HandleVisibility', 'off');
+ylabel('Salida y [grados]'); 
+legend('Medida Real', 'Modelo G(s)', 'Location', 'best');
+title('Comparacion: Planta Real vs Modelo Continuo Identificado')
+
+% Gráfico Inferior
 subplot(2,1,2);
-plot(t(k_val),errores); grid on;
-xlabel('Tiempo [s]'); ylabel('Error validacion');
-legend('Medida - G(z)','Medida - G(s)','Location','best');
+plot(t(k_val), errores(:, 2), 'g', 'LineWidth', 1.2); grid on;
+xlabel('Tiempo [s]'); 
+ylabel('Error [Medida - G(s)]');
+legend('Error de validacion G(s)', 'Location', 'best');
+title('Evolucion del Error en el Tramo de Validacion');
+%% 7. Guardo el modelo
+save('modelo_estimado.mat', 'G', 'Gz', 'K', 'p1', 'p2', 'u0', 'y0');
