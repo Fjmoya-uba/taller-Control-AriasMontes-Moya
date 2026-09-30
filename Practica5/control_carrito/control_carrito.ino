@@ -11,11 +11,11 @@
 #include <math.h>
 
 // -------- Parametros para modificar --------
-const float REFERENCIA_CM = 17.5f; // Distancia deseada desde el sensor: medir.
-const float kp = 0.5f;            // grados / cm
+const float REFERENCIA_CM = 17.0f; // Distancia deseada desde el sensor: medir.
+const float kp = 8.0f;            // grados / cm
 const float ki = 0.0f;            // grados / (cm*s)
 const float kd = 0.0f;            // grados*s / cm
-const float MAX_ANGULO = 8.0f;    // Limite de inclinacion de la barra.
+const float MAX_ANGULO = 15.0f;    // Limite de inclinacion de la barra.
 const float KP_ANGULO = 20.0f;    // us / grado, ajustar primero este lazo.
 // Ganancias iniciales de prueba, no sintonizadas para el mecanismo.
 // Calibracion de mover_servo.ino: comandos nominales, no angulos de barra.
@@ -71,7 +71,7 @@ void actualizarAngulo() {
 
 void actualizarPosicion() {
   unsigned long ahora = micros();
-  if (ahora - ultimaPosicion < 60000UL) return; // Un eco cada 60 ms.
+  if (ahora - ultimaPosicion < 20000UL) return; // Un eco cada 60 ms.
   float dt = (ahora - ultimaPosicion) * 1e-6f;
   ultimaPosicion = ahora;
   unsigned int eco = sonar.ping();
