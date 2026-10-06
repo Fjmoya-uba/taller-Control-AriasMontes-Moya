@@ -1,4 +1,4 @@
-﻿/* PID de posicion del carrito + control P del angulo de la barra.
+/* V2: controlador discreto de posicion del carrito + control P del angulo de la barra.
  * HC-SR04: TRIG 6, ECHO 7. MPU6050 por I2C. Servo en 9.
  * Mantener la barra quieta al arrancar para calibrar el giroscopio.
  * MATLAB: "abcd" + referencia_cm + distancia_cm + servo_us (3 float32 LE).
@@ -15,14 +15,14 @@
 
 // -------- Parametros para modificar --------
 const float REFERENCIA_CM = 17.0f; // Distancia deseada desde el sensor: medir.
-const float ko = 7.65f; 
-const float To = 1.11f; // segundos
-const float kp = 10.0f ;            // grados / cm
-const float ki = 4.0f ;             // grados / (cm*s)
-const float kd = 0.02f;            // grados*s / cm
+// MATLAB: Tustin con Ts = 0.02 s. Incluye el filtro de la derivada.
+// u[k] = COEF_A*u[k-1] + COEF_B0*e[k] + COEF_B1*e[k-1].
+const float COEF_A = 0.600000f;
+const float COEF_B0 = 52.563947f;
+const float COEF_B1 = -51.936942f;
 const float MAX_ANGULO = 15.0f;    // Limite de inclinacion de la barra.
 const float KP_ANGULO = 20.0f;    // us / grado, ajustar primero este lazo.
-// Ganancias iniciales de prueba, no sintonizadas para el mecanismo.
+// Ajustar el lazo de angulo de acuerdo con la planta usada en MATLAB.
 // Calibracion de mover_servo.ino: comandos nominales, no angulos de barra.
 const int ANGULO_SERVO_CERO = 7;
 const int ANGULO_SERVO_MIN = -35; // -42 grados nominales respecto del cero.
@@ -39,24 +39,25 @@ const float CERO_IMU = 0.0f;      // Angulo del acelerometro con barra horizonta
 const float SIGNO_POSICION = 1.0f;
 // +1 si aumentar pulso AUMENTA angulo medido; -1 si lo disminuye.
 const float SIGNO_SERVO = 1.0f;
-const float ALFA = 0.92f; // 
-const unsigned long TS_US = 20000UL;
+const float ALFA = 0.92f; //
+const unsigned long TS_US = 20000UL; // Si cambia, recalcular COEF_A, COEF_B0 y COEF_B1 en MATLAB.
 const unsigned long SONAR_US = 60000UL;
 // 16 bytes * 10 bits / 115200 = 1389 us; margen para llamadas e interrupciones.
 const unsigned long RESERVA_TX_US = 2500UL;
 static_assert(sizeof(float) == 4, "La trama requiere float32");
-unsigned long siguienteControl, ultimoControl;
+unsigned long siguienteControl;
 unsigned long periodosExcedidos = 0, tramasOmitidas = 0;
 unsigned long erroresIMU = 0;
-float derivadaError = 0; // cm/s; conserva d[k-1] entre mediciones.
-float errorAnterior = 0; // Error de la ultima medicion valida.
+float errorAnteriorControl = 0;
+float salidaAnteriorControl = 0;
+bool controladorInicializado = false;
 
 Servo servo;
 Adafruit_MPU6050 mpu;
-NewPing sonar(6, 7, 40);          // Hasta 40 cm.
+NewPing sonar(6, 7, 35);          // Hasta 35 cm.
 float angulo = 0, biasGyro = 0;
 float distancia = 0;
-float referenciaAngulo = 0, integral = 0;
+float referenciaAngulo = 0;
 bool distanciaValida = false;
 int pulso = PULSO_CENTRO;
 unsigned long ultimaIMU, ultimaPosicion;
@@ -85,6 +86,13 @@ bool leerIMU(sensors_event_t &a, sensors_event_t &g, sensors_event_t &t) {
   return true;
 }
 
+void reiniciarControlador() {
+  errorAnteriorControl = 0;
+  salidaAnteriorControl = 0;
+  controladorInicializado = false;
+  referenciaAngulo = 0;
+}
+
 void actualizarAngulo() {
   unsigned long ahora = micros();
   // Se llama una sola vez por periodo de control.
@@ -92,91 +100,51 @@ void actualizarAngulo() {
   ultimaIMU = ahora;
   sensors_event_t a, g, t;
   if (!leerIMU(a, g, t)) {
-    integral = 0;
+    reiniciarControlador();
     // Conservar el ultimo mando y reintentar en el siguiente periodo.
     return;
   }
   float velocidad = (g.gyro.x - biasGyro) * 180.0f / PI;
   angulo = ALFA * (angulo + velocidad * dt) + (1.0f - ALFA) * anguloAccel(a);
 
-  // El PID de posicion pide grados; este lazo entrega microsegundos.
+  // El controlador de posicion pide grados; este lazo entrega microsegundos.
   float mando = PULSO_CENTRO + SIGNO_SERVO * KP_ANGULO * (referenciaAngulo - angulo);
   pulso = (int)lroundf(constrain(mando, (float)PULSO_MIN, (float)PULSO_MAX));
   servo.writeMicroseconds(pulso);
 }
 
 
-void actualizarPosicion(float dt) {
-
+void actualizarPosicion() {
   const unsigned long ahora = micros();
-
   if (ahora - ultimaPosicion >= SONAR_US) {
-
-    const float dtMedicion = (ahora - ultimaPosicion) * 1e-6f;
-
     ultimaPosicion = ahora;
-
     const unsigned int eco = sonar.ping(); // Timeout limitado por alcance de 40 cm.
-
-    if (eco == 0) {
-
-      distanciaValida = false;
-
-      derivadaError = 0; // Reiniciar memoria si se pierde el eco.
-
-    } else {
-
+    distanciaValida = (eco != 0);
+    if (distanciaValida) {
       distancia = eco / 58.574f;
-
-      const float errorMedicion = REFERENCIA_CM - distancia;
-
-     
-
-      if (distanciaValida) {
-
-        // Tustin: s = (2/T)*(1-z^-1)/(1+z^-1).
-
-        // d[k] = (2/T)*(e[k]-e[k-1]) - d[k-1].
-
-        // Derivador ideal: puede mantener oscilaciones por ruido (polo z=-1).
-
-        derivadaError = (2.0f / dtMedicion) *
-
-                       (errorMedicion - errorAnterior) - derivadaError;
-
-      } else {
-
-        // Primera lectura o recuperacion del eco: iniciar sin salto derivativo.
-
-        derivadaError = 0;
-
-      }
-
-     
-
-      errorAnterior = errorMedicion;
-
-      distanciaValida = true;
-
     }
-
   }
 
   if (!distanciaValida) {
-    referenciaAngulo = 0;
-    integral = 0;
+    reiniciarControlador();
     return;
   }
-  // PID a 50 Hz con la ultima medicion y derivada disponibles.
+
+  // Ejecutar cada 20 ms, reteniendo la ultima posicion entre ecos.
   const float error = REFERENCIA_CM - distancia;
-  const float nuevaIntegral = ki == 0 ? 0 : integral + ki * error * dt;
-  float salida = kp * error + nuevaIntegral + kd * derivadaError;
-  if (ki == 0 || (salida >= -MAX_ANGULO && salida <= MAX_ANGULO) ||
-      (salida > MAX_ANGULO && ki * error < 0) ||
-      (salida < -MAX_ANGULO && ki * error > 0)) {
-    integral = nuevaIntegral;
+  if (!controladorInicializado) {
+    // Arranque o recuperacion sin golpe derivativo: u = Kp*error.
+    errorAnteriorControl = error;
+    salidaAnteriorControl = ((COEF_B0 + COEF_B1) / (1.0f - COEF_A)) * error;
+    controladorInicializado = true;
   }
-  salida = kp * error + integral + kd * derivadaError;
+
+  const float salida = COEF_A * salidaAnteriorControl
+                     + COEF_B0 * error
+                     + COEF_B1 * errorAnteriorControl;
+  errorAnteriorControl = error;
+  // Guardar SIN recortar para conservar la dinamica del filtro.
+  salidaAnteriorControl = salida;
   referenciaAngulo = SIGNO_POSICION * constrain(salida, -MAX_ANGULO, MAX_ANGULO);
 }
 
@@ -224,7 +192,6 @@ void setup() {
   angulo = anguloAccel(a);
   ultimaIMU = micros();
   ultimaPosicion = ultimaIMU - SONAR_US; // Medir en el primer ciclo.
-  ultimoControl = ultimaIMU;
   siguienteControl = ultimaIMU + TS_US;
 }
 
@@ -238,9 +205,7 @@ void loop() {
     digitalWrite(LED_BUILTIN, HIGH);
     siguienteControl = ahora + TS_US;
   }
-  const float dt = (ahora - ultimoControl) * 1e-6f;
-  ultimoControl = ahora;
-  actualizarPosicion(dt);
+  actualizarPosicion();
   actualizarAngulo();
   enviarRegistro(siguienteControl);
   if ((long)(micros() - siguienteControl) >= 0) {
@@ -249,4 +214,3 @@ void loop() {
     siguienteControl = micros() + TS_US;
   }
 }
-
