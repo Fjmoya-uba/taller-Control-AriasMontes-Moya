@@ -1,0 +1,29 @@
+% Comenzamos
+clear; clc; close all;
+
+s = tf("s");
+
+z = [];
+p = [-0.002397];
+kp = -0.004233;
+
+P = zpk(z,p,kp);
+P
+
+bode(P); grid on;
+% bueno lo que tenemos es una planta que si la realimento es inestable con
+% un marge de fase de -55 grados y wc = 0.00349. Es una planta muy lenta,
+% vamos a ver que es lo que podemos hacer...
+%% Vamos por un controlador
+
+z = [-0.004233];
+p = [0];
+kc = 1;
+
+C = zpk(z,p,kc);
+C
+
+L = minreal(C*P);
+L
+
+bode(L); grid on;
