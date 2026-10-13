@@ -1,0 +1,21 @@
+%% Cargar el modelo estimado previamente
+clear; clc; close all;
+
+% Carga el archivo .mat que generó el script de estimación
+load('modelo_estimado.mat'); 
+
+% A partir de acá ya tenés disponibles en el Workspace:
+% G, Gz, K, p1, p2, u0, y0, etc.
+ 
+s = tf("s");
+
+% Bueno, busco hacer un control en cascada asi que primero veamos que
+% tenemos en la dinámica interna.
+
+bode(G); grid on;
+
+% Okay, tiene una ganancia de -28 db, lo que voy a buscar es que la barra
+% pueda responder lo suficientemente rápido para controlar al carrito.
+% Vamos a buscar que el servo responda en unos 0.25 segundos.
+
+%% Bueno, nos 

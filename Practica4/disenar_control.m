@@ -25,16 +25,17 @@ H0 = G * K_fisico * 1/s^2;
 % Ahora, el fabricante impone un tiempo de muestreo de la pocisión cada 60
 % ms aproximadamente, esto se aproxima por pade como un atraso de fase
 
-Pade = (1-s*0.06/2)/(1+s*0.06/2);
-Pade
+%Pade = (1-s*0.06/2)/(1+s*0.06/2);
+%Pade
 
-H = minreal(H0*Pade);
-H
+% Probamos sin Pade de momento.
+
+H = H0;
 
 bode(H); grid on;
 
 
-% Tiene un margen de fase de -7° aprox y el cruce por 0 db es en 0.8
+% Tiene un margen de fase de -1.75° aprox y el cruce por 0 db es en 0.8
 % rad/seg aprox.
 
 % Lo que voy a buscar es poner una red de adelanto para levantar la fase,
@@ -42,20 +43,24 @@ bode(H); grid on;
 % rad/seg
 %% Vamos con el controlador
 
-z = [-0.6]; % el tiempo de asentamiento es wc/4 aprox.
-p = [-25];
+z = [-0.3 -0.5]; % el tiempo de asentamiento es wc/4 aprox.
+p = [-20 0];
 
 C = zpk(z, p, 1);
-C
 
 CP = minreal(H*C);
-%bode(CP); grid on;
+bode(CP); grid on;
+
+
+%% Incluyo la ganancia que antes aplique a CP.
+C_total = C * db2mag(37.5);
+
+CP = minreal(H*C_total);
+bode(CP); grid on;
 
 % Ahora busco que wc sea 2 rad/seg, ya que tengo una respuesta de 2
 % segundos para que el carrito vaya de un extremo de la barra al centro
 
-CP = CP*db2mag(36.3);
-bode(CP); grid on;
 %% Lazo cerrado de posición
 T = feedback(CP, 1);
 
@@ -78,9 +83,6 @@ xlabel('Tiempo [s]');
 
 %% Ganancias y discretizacion del controlador
 
-% Incluyo la ganancia que antes aplique a CP.
-C_total = C * db2mag(36.3);
-
 % La red de adelanto equivale a un PD con derivada filtrada:
 % C_total(s) = Kp + Ki/s + Kd*s/(Tf*s + 1). En este caso Ki = 0.
 C_pid = pid(C_total);
@@ -93,13 +95,18 @@ fprintf('\n--- Ganancias del controlador ---\n');
 fprintf('Kp = %.6f\nKi = %.6f\nKd = %.6f\nTf = %.6f s\n', Kp, Ki, Kd, Tf);
 
 % Estas ganancias describen el controlador continuo; ahora lo discretizo.
-Ts = 0.02; % 20 ms: periodo de control del Arduino (sonar cada 60 ms).
+Ts = 0.02; % 20 ms: periodo de control del Arduino 
 Cz = c2d(C_total, Ts, 'tustin');
 Cz
 
-% Coeficientes para implementar el controlador completo, incluido el filtro.
 [b, a] = tfdata(tf(Cz), 'v');
-% u[k] = -a(2)*u[k-1] + b(1)*e[k] + b(2)*e[k-1], con a(1) = 1.
-fprintf('u[k] = %.6f*u[k-1] + %.6f*e[k] + %.6f*e[k-1]\n', -a(2), b(1), b(2));
-% Ejecutar esta ecuacion cada Ts, reteniendo la posicion entre ecos.
-% Copiar solo Kp, Ki y Kd al PID actual del Arduino no reproduce el filtro Tf.
+
+if length(a) == 2
+    % Primer orden (PD o red de adelanto simple)
+    fprintf('u[k] = %.6f*u[k-1] + %.6f*e[k] + %.6f*e[k-1]\n', ...
+            -a(2), b(1), b(2));
+elseif length(a) == 3
+    % Segundo orden (PID o adelanto + integrador)
+    fprintf('u[k] = %.6f*u[k-1] + %.6f*u[k-2] + %.6f*e[k] + %.6f*e[k-1] + %.6f*e[k-2]\n', ...
+            -a(2), -a(3), b(1), b(2), b(3));
+end

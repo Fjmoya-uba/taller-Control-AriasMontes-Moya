@@ -3,6 +3,7 @@
  * HC-SR04: TRIG 6, ECHO 7; servo 9. IMU omitida para reducir jitter.
  * MATLAB: "abcd" + [referencia_cm, distancia_cm, pulso_us], float32 LE.
  * LED latcheado: periodo excedido o trama omitida. Sin texto por Serial.
+ * Control y disparos del sonar a 50 Hz (20 ms), con captura no bloqueante.
  */
 #include <Arduino.h>
 #include <Servo.h>
@@ -12,13 +13,16 @@
 
 // Parametros de sintonia. C(z) entrega microsegundos, NO grados.
 const float REFERENCIA_CM = 17.0f;
-const float COEF_A = 0.600000f;
-const float COEF_B0 = 52.563947f;
-const float COEF_B1 = -51.936942f;
+const float COEF_A1 = 1.666667f;
+const float COEF_A2 = -0.666667f;
+const float COEF_B0 = 62.992051f;
+const float COEF_B1 = -124.980493f;
+const float COEF_B2 = 61.992192f;
 const float SIGNO_CONTROL = 1.0f; // +1 o -1 segun el sentido fisico.
 // MATLAB, incluyendo la ganancia del controlador completo:
 // Cz = c2d(C_total, 0.02, 'tustin'); [b,a] = tfdata(tf(Cz),'v');
-// COEF_A = -a(2)/a(1); COEF_B0 = b(1)/a(1); COEF_B1 = b(2)/a(1).
+// COEF_A1 = -a(2)/a(1); COEF_A2 = -a(3)/a(1).
+// COEF_B0 = b(1)/a(1); COEF_B1 = b(2)/a(1); COEF_B2 = b(3)/a(1).
 // Misma calibracion mecanica que v2: Servo.write(7 + 90), attach por defecto.
 const int ANGULO_SERVO_CERO = 7;
 const int PULSO_CENTRO = MIN_PULSE_WIDTH +
@@ -27,12 +31,15 @@ const int PULSO_CENTRO = MIN_PULSE_WIDTH +
 const int PULSO_MIN = 1000;
 const int PULSO_MAX = 2000;
 const uint32_t TS_US = 20000UL;
-const uint32_t SONAR_US = 60000UL;
+const uint32_t SONAR_US = TS_US; // Un disparo cada 20 ms: 50 Hz.
+// HC-SR04 recomienda >60 ms entre disparos; validar ecos a 20 ms en el montaje.
 const uint32_t RESERVA_TX_US = 2500UL; // 16 bytes a 115200: ~1389 us.
 const uint8_t PIN_TRIG = 6, PIN_ECHO = 7, PIN_SERVO = 9;
 const float MAX_DISTANCIA_CM = 35.0f;
 const float US_POR_CM = 58.574f; // Misma conversion que en v2.
 const uint32_t TIMEOUT_ECO_US = 4000UL;
+static_assert(TIMEOUT_ECO_US < SONAR_US,
+              "El eco debe finalizar antes del siguiente disparo");
 static_assert(sizeof(float) == 4, "La trama requiere float32");
 static_assert(PULSO_MIN <= PULSO_CENTRO && PULSO_CENTRO <= PULSO_MAX,
               "El centro debe estar dentro de los limites");
@@ -43,7 +50,7 @@ uint32_t periodosExcedidos = 0, tramasOmitidas = 0;
 float distancia_cm = -1.0f;
 bool distanciaValida = false;
 float errorAnteriorControl = 0.0f, salidaAnteriorControl = 0.0f;
-bool controladorInicializado = false;
+float errorDosAtrasControl = 0.0f, salidaDosAtrasControl = 0.0f;
 int pulso = PULSO_CENTRO;
 
 enum EstadoSonar { REPOSO, TRIGGER_ALTO, ESPERA_SUBIDA, ESPERA_BAJADA };
@@ -57,8 +64,9 @@ bool vencido(uint32_t ahora, uint32_t instante) {
 
 void reiniciarControlador() {
   errorAnteriorControl = 0.0f;
+  errorDosAtrasControl = 0.0f;
   salidaAnteriorControl = 0.0f;
-  controladorInicializado = false;
+  salidaDosAtrasControl = 0.0f;
 }
 
 void finalizarEco(float medida) {
@@ -74,7 +82,9 @@ void atenderSonar(uint32_t ahora) {
   switch (estadoSonar) {
     case REPOSO:
       if (vencido(ahora, siguienteSonar)) {
-        siguienteSonar = ahora + SONAR_US;
+        // Mantener la grilla temporal; omitir disparos atrasados sin rafagas.
+        const uint32_t periodos = (ahora - siguienteSonar) / SONAR_US + 1;
+        siguienteSonar += periodos * SONAR_US;
         inicioPing = ahora;
         digitalWrite(PIN_TRIG, HIGH);
         estadoSonar = TRIGGER_ALTO;
@@ -106,21 +116,22 @@ void actualizarControl() {
     reiniciarControlador();
     pulso = PULSO_CENTRO;
   } else {
-    // ZOH: distancia_cm solo cambia al terminar un eco, cada ~60 ms.
+    // ZOH: distancia_cm cambia al terminar el eco de cada disparo a 50 Hz.
     const float error = REFERENCIA_CM - distancia_cm;
-    if (!controladorInicializado) {
-      // Inicializacion en equilibrio del filtro: evita golpe derivativo
-      // al arrancar o recuperar el eco. No se arrastra historia invalida.
-      errorAnteriorControl = error;
-      salidaAnteriorControl = (COEF_B0 + COEF_B1) / (1.0f - COEF_A) * error;
-      controladorInicializado = true;
-    }
-    const float salida = COEF_A * salidaAnteriorControl
-                       + COEF_B0 * error + COEF_B1 * errorAnteriorControl;
+    // u es la variacion de pulso [us] respecto de PULSO_CENTRO.
+    // Condiciones iniciales nulas al arrancar o recuperar una medida valida.
+    const float salida = COEF_A1 * salidaAnteriorControl
+                       + COEF_A2 * salidaDosAtrasControl
+                       + COEF_B0 * error
+                       + COEF_B1 * errorAnteriorControl
+                       + COEF_B2 * errorDosAtrasControl;
+    // Desplazar las memorias despues de evaluar todos los terminos.
+    errorDosAtrasControl = errorAnteriorControl;
     errorAnteriorControl = error;
+    salidaDosAtrasControl = salidaAnteriorControl;
     salidaAnteriorControl = salida; // Estado sin saturar: conserva C(z).
     const float mando = PULSO_CENTRO + SIGNO_CONTROL * salida;
-    pulso = (int)constrain(lroundf(mando), (long)PULSO_MIN, (long)PULSO_MAX);
+    pulso = (int)lroundf(constrain(mando, (float)PULSO_MIN, (float)PULSO_MAX));
   }
   servo.writeMicroseconds(pulso);
 }

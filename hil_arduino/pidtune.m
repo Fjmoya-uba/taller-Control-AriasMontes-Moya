@@ -11,6 +11,8 @@ opt = pidtuneOptions('PhaseMargin', 60);
 % Para un controlador tipo PI:
 [C_pi, info] = pidtune(P, 'PI', wc_deseado, opt);
 
+C_pi
+%%
 L = minreal(C_pi * P);
 bode(L); grid on;
 

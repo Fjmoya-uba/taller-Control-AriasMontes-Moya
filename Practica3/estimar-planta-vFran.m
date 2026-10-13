@@ -80,7 +80,7 @@ figure('Name', 'Validación de la Planta Contínua G(s)');
 
 % Grafico superior
 subplot(2,1,1);
-plot(t, y, 'b', y_cont, 'g-', 'LineWitdh', 1.2); grid on;
+plot(t, y, 'b', y_cont, 'g-'); grid on;
 xline(t(n_est+1), '--r', 'Inicio Validación', 'HandleVisibility', 'off');
 ylabel('Salida y [grados]'); 
 legend('Medida Real', 'Modelo G(s)', 'Location', 'best');
@@ -95,3 +95,7 @@ legend('Error de validacion G(s)', 'Location', 'best');
 title('Evolucion del Error en el Tramo de Validacion');
 %% 7. Guardo el modelo
 save('modelo_estimado.mat', 'G', 'Gz', 'K', 'p1', 'p2', 'u0', 'y0');
+
+%%
+
+step(100*G*exp(-0.04*s));

@@ -16,8 +16,8 @@ float u = 0.5;
 
 // Parámetros calculados por Tustin en MATLAB
 const float alpha_1 = 1.0f;
-const float alpha_2 = -143.878928f;
-const float alpha_3 = 101.061654f;
+const float alpha_2 = -6.565000f;
+const float alpha_3 = 6.435000f;
 
 void setup() {
   Serial.begin(115200);

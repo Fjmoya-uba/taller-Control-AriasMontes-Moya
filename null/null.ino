@@ -1,5 +1,6 @@
 void setup() {
   // Configuración vacía
+
 }
 
 void loop() {
