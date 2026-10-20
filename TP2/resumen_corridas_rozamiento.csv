@@ -1,0 +1,13 @@
+corrida,inclinacion_s,recorte_desde_s,recorte_hasta_s,duracion_util_s,muestras_utiles,angulo_mediano_deg,motivo_fin
+1,2.04,2,4.14,1.82,92,0.947293162345886,posicion estable (posible contacto)
+2,8.04,7.88,8.86,0.66,34,-6.16071057319641,primer pico aislado
+3,14.04,13.94,14.72,0.460000000000001,24,4.97879958152771,primer pico aislado
+4,20.04,19.88,20.58,0.380000000000003,20,-11.5982575416565,primer pico aislado
+5,26.04,25.98,28.76,2.46,124,0.975432187318802,posicion estable (posible contacto)
+6,32.06,31.9,32.94,0.719999999999999,37,-6.0945029258728,primer pico aislado
+7,38.04,37.94,38.74,0.479999999999997,25,4.47380495071411,posicion estable (posible contacto)
+8,44.06,43.9,44.62,0.399999999999999,21,-10.3954830169678,primer pico aislado
+9,50.04,50.36,52.18,1.5,76,1.35377091169357,posicion estable (posible contacto)
+10,56.06,55.9,56.86,0.640000000000001,33,-6.20971584320068,primer pico aislado
+11,62.04,61.94,62.9,0.640000000000001,33,5.04608726501465,posicion estable (posible contacto)
+12,68.04,67.88,68.62,0.420000000000002,22,-10.0963850021362,primer pico aislado

@@ -2,64 +2,46 @@
 clear; clc; close all;
 
 % Carga el archivo .mat que generó el script de estimación
-load('modelo_estimado.mat'); 
+%load('modelo_estimado.mat'); 
+%load('dinamica_carrito_estimada.mat');
 
-% A partir de acá ya tenés disponibles en el Workspace:
-% G, Gz, K, p1, p2, u0, y0, etc.
+p1 = [-45.5373-15.3815i -45.5373+15.3815i];
+z1 = [];
+k1 = 87.92;
+
+G_barra = zpk(z1,p1,k1)
+
+p2 = [0 -8.4596013];
+z2 = [];
+k2 = 50.389071;
+
+G_carrito = zpk(z2,p2,k2)
 
 %% Modelización de la planta total
 
-% Le agrego los dos ceros en el origen de la dinámica con el carrito
 s = tf("s");
 
-% Como yo mido la posición a través del sensor, y como al controlar
-% la inclinación de la barra esta se traduce en una acelaración por la
-% gravedad, el carrito impone una dinámica externa de dos polos en el
-% origen con respecto a los otros polos complejos que tenía la dinámica
-% interna del servo-barra.
+Pade = (1-s*0.02/2)/(1+s*0.02/2);
 
-K_fisico =  981 * (pi/180); % ya que paso de grados a centímetros
-
-H0 = G * K_fisico * 1/s^2;
-
-% Ahora, el fabricante impone un tiempo de muestreo de la pocisión cada 60
-% ms aproximadamente, esto se aproxima por pade como un atraso de fase
-
-%Pade = (1-s*0.06/2)/(1+s*0.06/2);
-%Pade
 
 % Probamos sin Pade de momento.
 
-H = H0;
+H = minreal(G_barra*G_carrito);
+H
 
-bode(H); grid on;
+%bode(H); grid on;
 
 
-% Tiene un margen de fase de -1.75° aprox y el cruce por 0 db es en 0.8
-% rad/seg aprox.
-
-% Lo que voy a buscar es poner una red de adelanto para levantar la fase,
-% quiero poner un cero lento para que la fase pueda aumentar alrededor de 1
-% rad/seg
 %% Vamos con el controlador
 
-z = [-0.3 -0.5]; % el tiempo de asentamiento es wc/4 aprox.
-p = [-20 0];
-
-C = zpk(z, p, 1);
+z = [-1.2 -10]; % el tiempo de asentamiento es 4/wc aprox.
+p = [0 -20];
+k = db2mag(26);
+C = zpk(z, p, k);
 
 CP = minreal(H*C);
 bode(CP); grid on;
 
-
-%% Incluyo la ganancia que antes aplique a CP.
-C_total = C * db2mag(37.5);
-
-CP = minreal(H*C_total);
-bode(CP); grid on;
-
-% Ahora busco que wc sea 2 rad/seg, ya que tengo una respuesta de 2
-% segundos para que el carrito vaya de un extremo de la barra al centro
 
 %% Lazo cerrado de posición
 T = feedback(CP, 1);
@@ -85,7 +67,7 @@ xlabel('Tiempo [s]');
 
 % La red de adelanto equivale a un PD con derivada filtrada:
 % C_total(s) = Kp + Ki/s + Kd*s/(Tf*s + 1). En este caso Ki = 0.
-C_pid = pid(C_total);
+C_pid = pid(C);
 Kp = C_pid.Kp;
 Ki = C_pid.Ki;
 Kd = C_pid.Kd;
@@ -96,7 +78,7 @@ fprintf('Kp = %.6f\nKi = %.6f\nKd = %.6f\nTf = %.6f s\n', Kp, Ki, Kd, Tf);
 
 % Estas ganancias describen el controlador continuo; ahora lo discretizo.
 Ts = 0.02; % 20 ms: periodo de control del Arduino 
-Cz = c2d(C_total, Ts, 'tustin');
+Cz = c2d(C, Ts, 'tustin');
 Cz
 
 [b, a] = tfdata(tf(Cz), 'v');

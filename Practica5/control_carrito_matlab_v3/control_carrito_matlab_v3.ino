@@ -4,38 +4,48 @@
  * MATLAB: "abcd" + [referencia_cm, distancia_cm, pulso_us], float32 LE.
  * LED latcheado: periodo excedido o trama omitida. Sin texto por Serial.
  * Control y disparos del sonar a 50 Hz (20 ms), con captura no bloqueante.
+
+
  */
 #include <Arduino.h>
 #include <Servo.h>
+
 #include <math.h>
 #include <stdint.h>
 #include <string.h>
 
-// Parametros de sintonia. C(z) entrega microsegundos, NO grados.
-const float REFERENCIA_CM = 17.0f;
+// Ko = 23.0
+
+// TP2: p = d - d0. REFERENCIA_CM es d0, no una posicion relativa.
+const float REFERENCIA_CM = 15.612f;
+constexpr float POSICION_MIN_CM = -15.0f, POSICION_MAX_CM = 21.0f;
+// Consigna relativa al cero fisico. La telemetria conserva distancias absolutas.
+constexpr float CONSIGNA_POSICION_CM = 0.0f;
+// C(z) en forma directa: salida incremental [us], error [cm].
 const float COEF_A1 = 1.666667f;
 const float COEF_A2 = -0.666667f;
-const float COEF_B0 = 62.992051f;
-const float COEF_B1 = -124.980493f;
-const float COEF_B2 = 61.992192f;
-const float SIGNO_CONTROL = 1.0f; // +1 o -1 segun el sentido fisico.
-// MATLAB, incluyendo la ganancia del controlador completo:
+const float COEF_B0 = 18.509383f;
+const float COEF_B1 = -33.214467f;
+const float COEF_B2 = 14.784894f;
+constexpr float SIGNO_CONTROL = 1.0f;
+// Discretizacion bilineal (Tustin) en MATLAB, con Ts = 0.02 s:
 // Cz = c2d(C_total, 0.02, 'tustin'); [b,a] = tfdata(tf(Cz),'v');
-// COEF_A1 = -a(2)/a(1); COEF_A2 = -a(3)/a(1).
-// COEF_B0 = b(1)/a(1); COEF_B1 = b(2)/a(1); COEF_B2 = b(3)/a(1).
+// COEF_A1 = -a(2)/a(1); COEF_A2 = -a(3)/a(1);
+// COEF_B0 = b(1)/a(1); COEF_B1 = b(2)/a(1); COEF_B2 = b(3)/a(1);
+// Completar con cero los coeficientes ausentes si el orden es menor que dos.
+// Se conserva el ensayo P; la planta completa aun no esta validada.
 // Misma calibracion mecanica que v2: Servo.write(7 + 90), attach por defecto.
 const int ANGULO_SERVO_CERO = 7;
 const int PULSO_CENTRO = MIN_PULSE_WIDTH +
     (long)(ANGULO_SERVO_CERO + 90) * (MAX_PULSE_WIDTH - MIN_PULSE_WIDTH) / 180;
 // Con MIN_PULSE_WIDTH=544 y MAX_PULSE_WIDTH=2400, el centro es 1544 us.
-const int PULSO_MIN = 1000;
+const int PULSO_MIN = 1100; // TP2: debajo de este valor la barra toca el piso.
 const int PULSO_MAX = 2000;
 const uint32_t TS_US = 20000UL;
 const uint32_t SONAR_US = TS_US; // Un disparo cada 20 ms: 50 Hz.
 // HC-SR04 recomienda >60 ms entre disparos; validar ecos a 20 ms en el montaje.
 const uint32_t RESERVA_TX_US = 2500UL; // 16 bytes a 115200: ~1389 us.
 const uint8_t PIN_TRIG = 6, PIN_ECHO = 7, PIN_SERVO = 9;
-const float MAX_DISTANCIA_CM = 35.0f;
 const float US_POR_CM = 58.574f; // Misma conversion que en v2.
 const uint32_t TIMEOUT_ECO_US = 4000UL;
 static_assert(TIMEOUT_ECO_US < SONAR_US,
@@ -43,6 +53,12 @@ static_assert(TIMEOUT_ECO_US < SONAR_US,
 static_assert(sizeof(float) == 4, "La trama requiere float32");
 static_assert(PULSO_MIN <= PULSO_CENTRO && PULSO_CENTRO <= PULSO_MAX,
               "El centro debe estar dentro de los limites");
+static_assert(POSICION_MIN_CM < POSICION_MAX_CM &&
+              CONSIGNA_POSICION_CM >= POSICION_MIN_CM &&
+              CONSIGNA_POSICION_CM <= POSICION_MAX_CM, "Rango de posicion invalido");
+
+static_assert(SIGNO_CONTROL == 1.0f || SIGNO_CONTROL == -1.0f,
+              "El signo debe ser +1 o -1");
 
 Servo servo;
 uint32_t siguienteControl, siguienteSonar;
@@ -70,7 +86,11 @@ void reiniciarControlador() {
 }
 
 void finalizarEco(float medida) {
-  distanciaValida = medida > 0.0f && medida <= MAX_DISTANCIA_CM;
+  const float posicion = medida - REFERENCIA_CM;
+  // Los limites son relativos. No recortar lecturas invalidas a los extremos.
+  // Este rango amplio no detecta ecos falsos dentro de el (ver ensayo TP2).
+  distanciaValida = isfinite(medida) && medida > 0.0f &&
+                   posicion >= POSICION_MIN_CM && posicion <= POSICION_MAX_CM;
   distancia_cm = distanciaValida ? medida : -1.0f;
   if (!distanciaValida) reiniciarControlador();
   estadoSonar = REPOSO;
@@ -117,21 +137,25 @@ void actualizarControl() {
     pulso = PULSO_CENTRO;
   } else {
     // ZOH: distancia_cm cambia al terminar el eco de cada disparo a 50 Hz.
-    const float error = REFERENCIA_CM - distancia_cm;
-    // u es la variacion de pulso [us] respecto de PULSO_CENTRO.
-    // Condiciones iniciales nulas al arrancar o recuperar una medida valida.
+    const float posicion = distancia_cm - REFERENCIA_CM;
+    const float error = CONSIGNA_POSICION_CM - posicion;
     const float salida = COEF_A1 * salidaAnteriorControl
                        + COEF_A2 * salidaDosAtrasControl
                        + COEF_B0 * error
                        + COEF_B1 * errorAnteriorControl
                        + COEF_B2 * errorDosAtrasControl;
-    // Desplazar las memorias despues de evaluar todos los terminos.
+    const float mando = PULSO_CENTRO + SIGNO_CONTROL * salida;
+    const float mandoLimitado = constrain(mando, (float)PULSO_MIN,
+                                                 (float)PULSO_MAX);
+    pulso = (int)lroundf(mandoLimitado);
     errorDosAtrasControl = errorAnteriorControl;
     errorAnteriorControl = error;
     salidaDosAtrasControl = salidaAnteriorControl;
-    salidaAnteriorControl = salida; // Estado sin saturar: conserva C(z).
-    const float mando = PULSO_CENTRO + SIGNO_CONTROL * salida;
-    pulso = (int)lroundf(constrain(mando, (float)PULSO_MIN, (float)PULSO_MAX));
+    // Realimentar la salida limitada, en coordenadas del controlador.
+    // Sin saturacion conserva C(z); al saturar limita la memoria recursiva.
+    // Es una proteccion simple, no un anti-windup universal para cualquier C(z).
+    // No incluir el redondeo a us para evitar cuantizacion en la recurrencia.
+    salidaAnteriorControl = SIGNO_CONTROL * (mandoLimitado - PULSO_CENTRO);
   }
   servo.writeMicroseconds(pulso);
 }
@@ -144,7 +168,7 @@ void enviarRegistro(uint32_t limite) {
     return; // No bloquear esperando espacio ni mandar una trama parcial.
   }
   uint8_t trama[16] = {'a', 'b', 'c', 'd'};
-  const float valores[3] = {REFERENCIA_CM,
+  const float valores[3] = {REFERENCIA_CM + CONSIGNA_POSICION_CM,
                            distanciaValida ? distancia_cm : -1.0f,
                            (float)pulso};
   for (uint8_t i = 0; i < 3; ++i) {

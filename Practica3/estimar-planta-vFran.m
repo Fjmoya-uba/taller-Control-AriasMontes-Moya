@@ -58,44 +58,87 @@ fprintf('K = %.8g\np1 = %.8g %+.8gi\np2 = %.8g %+.8gi\n', ...
 disp('Planta continua (variaciones respecto de u0 e y0):');
 G
 
+G_ret = G;
+G_ret.InputDelay = 0.02;
+
+y_cont = lsim(G, du, t_sim, [], 'zoh') + y0;
+y_ret  = lsim(G_ret, du, t_sim, [], 'zoh') + y0;
 %% 5. Simulacion libre y validacion en el tramo reservado
 % Estado inicial cero en variables centradas para ambos modelos.
 % Simulamos desde el inicio para llegar al corte con historia de entrada.
-y_dis = lsim(Gz, du, t_sim)+y0;
-y_cont = lsim(G, du, t_sim, [], 'zoh')+y0;
+y_dis  = lsim(Gz, du, t_sim) + y0;
+y_cont = lsim(G, du, t_sim, [], 'zoh') + y0;
+y_ret  = lsim(G_ret, du, t_sim, [], 'zoh') + y0; % Simulación con retardo
+
 k_val = (n_est+1:N)';
-errores = [y(k_val)-y_dis(k_val), y(k_val)-y_cont(k_val)];
+
+% Agrupamos los errores de los tres modelos: [Gz, G(s) sin retardo, G(s) con retardo]
+errores = [y(k_val) - y_dis(k_val), ...
+           y(k_val) - y_cont(k_val), ...
+           y(k_val) - y_ret(k_val)];
+
 rmse = sqrt(mean(errores.^2, 1));
-den_fit = norm(y(k_val)-mean(y(k_val)));
-fit = [NaN, NaN];
+den_fit = norm(y(k_val) - mean(y(k_val)));
+fit = [NaN, NaN, NaN];
 if den_fit > eps
-    fit = 100*(1-sqrt(sum(errores.^2, 1))/den_fit);
+    fit = 100 * (1 - sqrt(sum(errores.^2, 1)) / den_fit);
 end
+
 fprintf('\nValidacion: ultimo %.0f %% (sin usarlo en la regresion)\n', 100*(1-fraccion_estimacion));
-fprintf('G(z): RMSE = %.6g | FIT = %.2f %%\n', rmse(1), fit(1));
-fprintf('G(s): RMSE = %.6g | FIT = %.2f %%\n', rmse(2), fit(2));
-
-%% 6. Graficos
-figure('Name', 'Validación de la Planta Contínua G(s)');
-
-% Grafico superior
-subplot(2,1,1);
-plot(t, y, 'b', y_cont, 'g-'); grid on;
-xline(t(n_est+1), '--r', 'Inicio Validación', 'HandleVisibility', 'off');
-ylabel('Salida y [grados]'); 
-legend('Medida Real', 'Modelo G(s)', 'Location', 'best');
-title('Comparacion: Planta Real vs Modelo Continuo Identificado')
-
-% Gráfico Inferior
-subplot(2,1,2);
-plot(t(k_val), errores(:, 2), 'g', 'LineWidth', 1.2); grid on;
-xlabel('Tiempo [s]'); 
-ylabel('Error [Medida - G(s)]');
-legend('Error de validacion G(s)', 'Location', 'best');
-title('Evolucion del Error en el Tramo de Validacion');
+fprintf('G(z):     RMSE = %.6g | FIT = %.2f %%\n', rmse(1), fit(1));
+fprintf('G(s):     RMSE = %.6g | FIT = %.2f %%\n', rmse(2), fit(2));
+fprintf('G(s) + ret: RMSE = %.6g | FIT = %.2f %%\n', rmse(3), fit(3));
 %% 7. Guardo el modelo
-save('modelo_estimado.mat', 'G', 'Gz', 'K', 'p1', 'p2', 'u0', 'y0');
-
+save('modelo_estimado.mat', 'G');
 %%
-
+s = tf('s');
 step(100*G*exp(-0.04*s));
+
+%% Visualización de los datos
+figure('Name', 'Datos de Identificacion y Validacion', 'Color', 'white');
+
+% Gráfico de la Entrada (u)
+subplot(2,1,1);
+plot(t, u, 'LineWidth', 1.2);
+hold on;
+% Línea vertical que marca el fin de la estimación y el inicio de la validación
+xline(t(n_est), '--r', 'LineWidth', 1.5, 'DisplayName', 'Límite Estimación / Validación');
+grid on;
+xlabel('Tiempo [s]');
+ylabel('Entrada u(t)');
+title('Señal de Entrada al Servo');
+legend('Location', 'best');
+
+% Gráfico de la Salida (y)
+subplot(2,1,2);
+plot(t, y, 'Color', [0.85 0.33 0.1], 'LineWidth', 1.2);
+hold on;
+xline(t(n_est), '--r', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+grid on;
+xlabel('Tiempo [s]');
+ylabel('Salida y(t)');
+title('Salida Medida del Sistema');
+
+
+
+%% 6. Gráficos comparativos unificados
+figure('Name', 'Comparación del Modelo vs Medición Real', 'Color', 'white');
+
+% Gráfico superior: Las tres señales juntas en el tramo completo (o en validación)
+subplot(2,1,1);
+plot(t, y, 'k', 'LineWidth', 1.2); hold on;               % Salida real / filtro
+plot(t, y_cont, 'b--', 'LineWidth', 1.2);                 % Modelo por regresión
+xline(t(n_est+1), ':r', 'Inicio Validación', 'LineWidth', 1.5, 'HandleVisibility', 'off');
+grid on;
+ylabel('Salida y [grados]'); 
+legend('Medida Real / Filtro', 'Modelo Regresión G(s)', 'Modelo tfest G(s)', 'Location', 'best');
+title('Comparación de Modelos Identificados vs Salida Real');
+
+% Gráfico inferior: Errores de validación de ambos modelos
+subplot(2,1,2);
+plot(t(k_val), y(k_val) - y_cont(k_val), 'b', 'LineWidth', 1.2); hold on;
+grid on;
+xlabel('Tiempo [s]'); 
+ylabel('Error de Predicción');
+legend('Error Modelo Regresión', 'Error Modelo tfest', 'Location', 'best');
+title('Evolución del Error en el Tramo de Validación');

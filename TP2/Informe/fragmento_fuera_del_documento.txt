@@ -1,0 +1,31 @@
+﻿,
+    %
+
+    Se define la salida del sistema como la posición longitudinal del carrito, $y=p$, expresada en centímetros. Se fija $p=0$ con el centro geométrico del carrito alineado con la línea transversal que corresponde a la unión de las dos piezas de la barra. El sentido positivo corresponde al alejamiento respecto del sensor ultrasónico. Por lo que para obtener la medición del centro geométrico del carrito se necesita medir su longitud. El largo del carrito, medido con regla, es $l_c = (5,5 \pm 0,1) \ \text{cm}$. ,Con lo cual l del centro del carrito en la referencia se estima como $p_0 = d_0 + \frac{l_c}{2} \approx 18,362 \ \text{cm}$. La posición :   + \frac{l_c}{2}  p = x_p - p_0del sensor , así como errores propios a la hora de tomar las mediciones físicamente%
+    Para obtener el rango de valores límite de $p$, se extrajeron de la Tabla \ref{tab:medicion_carrito} los valores extremos medidos por el sensor. El límite inferior se alcanza cuando el carrito hace contacto con el broche que sostiene al propio sensor, correspondiente a la medición $4$, en donde $p_{min} = -10,081 \ \text{cm}$. Luego el límite superior se alcanza en la última medición registrable previo a que el carrito se cayera de la barra, correspondiente a la medición $11$, de donde se obtuvo que $p_{max} = 16.211 \ \text{cm}$. 
+Al combinar estos valores, se obtuvo el rango de posiciones $p$ como: \ \text{cm};  \ \text{cm},; 
+
+    %%%%%
+
+    Como $p = x_p - p_0$, las posiciones más cercanas al sensor que la referencia tienen $p<0$, y las más alejadas tienen $p>0$; la distancia $d$ permanece positiva. El ensayo no determina el umbral exacto a partir del cual falla la medición al acercarse al sensor.
+; 
+    En resúmen, los valores límites a considerar son los siguientes:
+
+    \begin{table}[H]
+        \centering
+        \label{tab:valores_limite}
+        \begingroup
+        \small
+        \setlength{\tabcolsep}{4pt}
+        \begin{tabular}{c|c}
+            \hline
+            \textbf{Variable} & \textbf{Rango}\\\hline
+            $u$ & $[1100 \ \mu\text{s}; 2000 \ \mu\text{s}]$\\\hline
+            $p$ & $[-10.081 \ \text{cm}; 16.211 \ \text{cm}]$\\\hline
+            $\theta_b$ & $[-16.71\degree; 17.87\degree]$\\\hline
+        \end{tabular}
+        \endgroup
+        \caption{Valores límite a considerar}
+        \par\vspace{2mm}
+    \end{table}
+    
