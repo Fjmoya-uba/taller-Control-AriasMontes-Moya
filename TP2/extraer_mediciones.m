@@ -6,4 +6,4 @@ out_struct.tout = out.tout;
 
 % 2. Reemplazar la variable out y guardarla en el archivo .mat
 out = out_struct;
-save('control_proporcional_integral_derivativo.mat', 'out');
+save('controlador_proporcional_derivativo_escalon.mat', 'out');

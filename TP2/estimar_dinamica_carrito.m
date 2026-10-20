@@ -5,16 +5,13 @@ S = load('mediciones_dinamica_carrito_1.mat');
 t = double(S.out.tout(:));
 u = double(S.out.d1(:));             % Angulo del filtro [grados], cero horizontal
 y = double(S.out.d2(:)) - 15.612;    % Distancia absoluta -> posicion [cm]
-assert(numel(t)==numel(u) && numel(t)==numel(y), 'Longitudes incompatibles.');
-assert(all(isfinite(t)) && all(diff(t)>0), 'Tiempo invalido/no creciente.');
-% No interpolar ecos invalidos ni unir segmentos separados: usar el tramo
-% continuo valido mas largo dentro del registro solicitado.
+
 t_inicio = 2;
-valido = isfinite(u) & isfinite(y) & y >= -9 & y <= 15 & ...
+valido = isfinite(u) & isfinite(y) & y >= -15 & y <= 21 & ...
          t >= t_inicio;
 bordes = diff([false; valido; false]);
 inicios = find(bordes==1); finales = find(bordes==-1)-1;
-assert(~isempty(inicios), 'No hay mediciones validas dentro de los limites.');
+
 [~,j] = max(finales-inicios+1); idx = (inicios(j):finales(j))';
 fprintf('Tramo continuo: filas %d a %d, tiempos %.3f a %.3f s.\n', ...
     idx(1),idx(end),t(idx(1)),t(idx(end)));

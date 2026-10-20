@@ -1,0 +1,3 @@
+Row,Max_abs_cm,Recuperacion_banda_0p2cm_s,Error_final_2s_cm,Pulso_min_us,Pulso_max_us,Muestras_en_limite
+Real,9.60250807952881,NaN,7.09269318450323,1533,1639,0
+Simulada,0.656794888743829,1.54,0.0567738129566886,1544,1551,0

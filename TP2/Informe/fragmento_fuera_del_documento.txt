@@ -1,31 +1,583 @@
-﻿,
+﻿\documentclass[a4paper, twoside, 10pt, spanish]{article}
+
+    \usepackage{listings}
+
+    \usepackage{booktabs}
+    \usepackage[margin=.95in]{geometry}
+    \usepackage{array}
+    \usepackage{pdflscape}
+    \usepackage{multirow}
+
+    \usepackage{amsmath}
+    \usepackage{xcolor}
+
+
+
+    % Definición del tamaño de página y los márgenes:
+    % Si preferís menos márgenes, descomentá la línea siguiente
+    %\usepackage[a4paper,headheight=16pt,scale={0.7,0.8},hoffset=0.5cm]{geometry}
+    \usepackage[demo]{graphicx}
+    \usepackage{caption}
+    \usepackage{subcaption}
+    \usepackage[utf8x]{inputenc}
+    \usepackage[spanish]{babel}  
+    \usepackage[per-mode=fraction]{siunitx}
+    \sisetup
+    {
+        output-decimal-marker = {.},
+        exponent-product = \cdot,
+            group-digits = integer,
+        group-separator = {,}
+    }
+
     %
+    % El paquete amsmath agrega algunas funcionalidades extra a las fórmulas.
+    % Además defino la numeración de las tablas y figuras al estilo "Figura 2.3",
+    % en lugar de "Figura 7". (Por lo tanto, aunque no uses fórmulas, si querés
+    % este tipo de numeración dejá el paquete amsmath descomentado).
+    %
+    \usepackage{amsmath, amsfonts, amssymb}
+    \usepackage{yhmath}
+    %\numberwithin{equation}{section}
+    %\numberwithin{figure}{section}
+    \numberwithin{table}{section}
+    % ENCABEZADO y PIE DE PÁGINA
 
-    Se define la salida del sistema como la posición longitudinal del carrito, $y=p$, expresada en centímetros. Se fija $p=0$ con el centro geométrico del carrito alineado con la línea transversal que corresponde a la unión de las dos piezas de la barra. El sentido positivo corresponde al alejamiento respecto del sensor ultrasónico. Por lo que para obtener la medición del centro geométrico del carrito se necesita medir su longitud. El largo del carrito, medido con regla, es $l_c = (5,5 \pm 0,1) \ \text{cm}$. ,Con lo cual l del centro del carrito en la referencia se estima como $p_0 = d_0 + \frac{l_c}{2} \approx 18,362 \ \text{cm}$. La posición :   + \frac{l_c}{2}  p = x_p - p_0del sensor , así como errores propios a la hora de tomar las mediciones físicamente%
-    Para obtener el rango de valores límite de $p$, se extrajeron de la Tabla \ref{tab:medicion_carrito} los valores extremos medidos por el sensor. El límite inferior se alcanza cuando el carrito hace contacto con el broche que sostiene al propio sensor, correspondiente a la medición $4$, en donde $p_{min} = -10,081 \ \text{cm}$. Luego el límite superior se alcanza en la última medición registrable previo a que el carrito se cayera de la barra, correspondiente a la medición $11$, de donde se obtuvo que $p_{max} = 16.211 \ \text{cm}$. 
-Al combinar estos valores, se obtuvo el rango de posiciones $p$ como: \ \text{cm};  \ \text{cm},; 
+    \usepackage{fancyhdr}   % Para poder personalizarlo
+    \usepackage{lastpage}   % Para poder saber cuántas páginas tiene el documento
+    \pagestyle{fancy}
+    \renewcommand{\sectionmark}[1]{\markboth{}{\thesection\ \ #1}}
+    \fancyhead{}	% Elimino el contenido del encabezado
+    % Muestra la sección a la derecha (izquierda) en páginas impares (pares)
+    \fancyhead[RO,LE]{\rightmark}
+    % El siguiente texto a la derecha (izquierda) en páginas pares (impares)
 
-    %%%%%
+    \fancyfoot{}	% Elimino el contenido del pie de página
+    % A la izquierda (derecha) en páginas pares (impares): nro. de página / total
+    \fancyfoot[LE,RO]{\thepage/\pageref{LastPage}}
+    % Hipervínculos (enlaces) en el documento (y modificación de atributos)
+    \usepackage{url}
+    \urlstyle{tt}
+    \usepackage[colorlinks=true,linkcolor=black, urlcolor=blue]{hyperref}
+    \hypersetup{
+        breaklinks,
+        baseurl       = http://,
+        pdfborder     = 0 0 0,
+        pdfpagemode   = UseNone,
+        pdfstartpage  = 1,
+        pdfcreator    = {Plantilla de informe de TP para \LaTeX{}},
+        bookmarksopen = true,
+        bookmarksdepth= 2,% to show sections and subsections
+        pdfauthor     = {Apellido~1, Apellido~2, Apellido~3},
+        pdftitle      = {-},
+        pdfsubject    = {Informe},
+        pdfkeywords   = {}%
+        }
 
-    Como $p = x_p - p_0$, las posiciones más cercanas al sensor que la referencia tienen $p<0$, y las más alejadas tienen $p>0$; la distancia $d$ permanece positiva. El ensayo no determina el umbral exacto a partir del cual falla la medición al acercarse al sensor.
-; 
-    En resúmen, los valores límites a considerar son los siguientes:
+    % ==== Paquetes para TikZ ====
+    \usepackage{tikz}
+    \usetikzlibrary{arrows.meta, positioning, shapes, calc}
+
+
+
+    \usepackage{enumerate}
+    \usepackage{booktabs}
+    \usepackage{multirow}
+    \usepackage{pgfplots}
+    \pgfplotsset{compat=1.18}
+    \usepackage{graphicx}
+    \pdfcompresslevel=9
+
+    % Todas las imágenes están en el directorio imgs:
+    \newcommand{\imgdir}{img}
+    \graphicspath{{\imgdir/}}
+    % El paquete recomendado actualmente es minted.
+    % Documentación: https://www.ctan.org/pkg/minted
+    \usepackage[
+            section,    % Numera el código según la sección
+        ]{minted}
+    % minted provee los comandos:
+
+    % 1)  \mint[<opciones>]{<lenguaje>}<delimitador><código><delimitador>
+    % 2)  \mintinline[<opciones>]{<lenguaje>}<delimitador><código><delimitador>
+    % 3)  \inputminted[<opciones>]{<lenguaje>}{<archivo>}
+    \setminted[c]{
+    %        style=,
+            linenos,            % Mostrar los números de línea
+            numberfirstline,    % Numerar SIEMPRE la primera línea mostrada
+            tabsize=4,          % Reemplazar las tabulaciones por 4 espacios
+            autogobble          % Eliminar espacio sobrante al comienzo
+        }
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % COMANDOS UTILES
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % los siguientes comandos permiten escribir de manera uniforme en todo el
+    % documento
+
+    % Para poder manejar los espacios al final de los comandos propios
+    \usepackage{xspace}
+
+    \usepackage{algorithm}
+    \usepackage{algpseudocode}
+
+    % Abreviatura de 'número' utilizando letras voladas (correcto español)
+    \newcommand{\Nro}{N.\textsuperscript{o}\xspace}
+    \newcommand{\nro}{n.\textsuperscript{o}\xspace}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % PAQUETES EXTRAS
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \usepackage{circuitikz}
+    \usepackage{listings}
+    \usepackage{xcolor}
+
+    % --- Configuración para mostrar código Python ---
+    \lstdefinestyle{pythonstyle}{
+        language=Python,
+        basicstyle=\ttfamily\small,
+        backgroundcolor=\color{gray!5},
+        frame=single,
+        framerule=0.3pt,
+        rulecolor=\color{gray!50},
+        keywordstyle=\color{blue!70!black},
+        stringstyle=\color{orange!70!black},
+        commentstyle=\color{gray!70!black}\itshape,
+        showstringspaces=false,
+        breaklines=true,
+        tabsize=4,
+        captionpos=b,
+    }
+    \lstset{style=pythonstyle}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % COMANDOS UTILES
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % los siguientes comandos permiten escribir de manera uniforme en todo el
+    % documento
+
+    % Para poder manejar los espacios al final de los comandos propios
+    \usepackage{xspace}
+
+    \usepackage{algorithm}
+    \usepackage{algpseudocode}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % PAQUETES EXTRAS
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \usepackage{circuitikz}
+    \usepackage{float}
+    \usepackage{multicol}
+    \usepackage{gensymb}
+    \usepackage{gensymb}
+
+
+    % NO cargues otra vez \usepackage{biblatex}
+    % NO uses 2 \addbibresource distintos salvo que realmente quieras 2 bases
+    \usepackage[backend=biber,
+    style=numeric-comp,
+    sorting=none,
+    language=spanish,
+    doi=false,
+    isbn=false,
+    url=true,
+    eprint=false
+    ]{biblatex}
+
+    \addbibresource{referencias.bib}
+    \usepackage{enumitem}
+
+    % INICIO DEL DOCUMENTO
+
+    \begin{document}
+
+    \begin{titlepage}
+    \centering
+
+    \includegraphics[width=0.2\textwidth]{imagenes/fiuba.pdf}\par\vspace{1cm}
+
+    {\scshape\LARGE Universidad de Buenos Aires \par}
+    \vspace{0.2cm}
+    {\scshape\Large Facultad de Ingeniería \par}
+    \vspace{0.2cm}
+    {\large 2° cuatrimestre 2026 \par}
+
+    \vspace{2cm}
+
+    {\Large \textbf{Taller de Automatización y Control}\par}
+
+    \vspace{1cm}
+
+    {\large \textbf{Trabajo Práctico N°2: Control Digital}\par}
+
+    \vspace{2cm}
+
+    % Tabla de integrantes
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|m{6cm}|m{2cm}|m{5cm}|}
+    \hline
+    \multicolumn{3}{|c|}{\textbf{Integrantes Grupo N° 1}} \\
+    \hline
+    \textbf{Nombre y apellido} & \textbf{Padrón} & \textbf{Correo} \\
+    \hline
+    Fransisco Javier Moya & 109899 & fjmoya@fi.uba.ar \\
+    \hline
+    Lucas Fabrizio Arias Montes & 110876 & lfarias@fi.uba.ar \\
+    \hline
+    \end{tabular}
+
+    \vfill
+
+    \end{titlepage}
+
+    \setcounter{page}{1}
+    \tableofcontents
+    \newpage
+
+    \section{Introducción}
+    En este trabajo práctico se buscará obtener un modelo matemático de la planta \textit{Ball and Beam} linealizado alrededor de su punto de equilibrio, tanto en formato transferencia entrada-salida (un sistema \textit{SISO}) como en variables de estado, y se comparará su respuesta con la de la planta real. Se considera que dicho punto de equilibrio es aquel donde la barra está perfectamente horizontal y con el carrito ubicado en la referencia de posición definida en el ensayo, próxima al centro de la barra.
+
+    Posteriormente se analizarán las limitaciones en el diseño de controladores que presenta dicho modelo y se proponen tres controladores distintos que estabilicen la planta: uno proporcional (P), uno proporcional-integral (PI) y uno proporcional-derivativo (PD), comparando las respuestas obtenidas en simulación contra las de la planta real.
+
+    \section{Modelado de la planta \textit{Ball and Beam}}
+    \subsection{Sistema de referencia}
+    Se define la entrada del sistema $u$ como el ancho de pulso de la señal de comando enviada por el Arduino al servomotor mediante \texttt{writeMicroseconds()}. Su significado físico es la duración del pulso, expresada en microsegundos, que el control interno del servo interpreta como una consigna de posición del eje. Inicialmente se consideró el intervalo $[1000,2000]\,\mu\text{s}$. Sin embargo, en el montaje ensayado, los comandos inferiores a $1100\,\mu\text{s}$ producen una colisión de la barra con el piso. Por lo que se adoptó entonces el intervalo operativo $u\in[1100,2000]\,\mu\text{s}$.
+
+    Experimentalmente se determinó que la barra queda horizontal con $u_0=1544\,\mu\text{s}$. Esta configuración define el cero tanto del giro del servo $\theta_s$ como de la inclinación de la barra $\theta_b$. La entrada incremental se define como $\Delta u=u-u_0$, con $\Delta u\in[-444,456]\,\mu\text{s}$.
+
+    El ángulo equivalente de comando $\theta_{\text{equiv}}$ se calcula con el mapeo nominal de la biblioteca \texttt{Servo.h} de Arduino, se convierte cada pulso enviado al servo a un ángulo teórico, utilizado en el ensayo ($544$ a $2400\,\mu\text{s}$ para $0$ a $180\degree$). El desplazamiento nominal referido al equilibrio es
+    \[
+    \theta_{s,\text{nom}}=\frac{180\degree}{1856\,\mu\text{s}}(u-1544\,\mu\text{s}).
+    \]
+    Esta coordenada de comando no constituye una medición del giro físico del eje. En el intervalo operativo se obtiene $\theta_{s,\text{nom}}\in[-43.06\degree,44.22\degree]$.
+
+    Se define la salida del sistema como la posición longitudinal del carrito, $y=p$, expresada en centímetros. Se fija $p=0$ tomando la posición en la que el centro del carrito se encuentra alineado con la línea transversal correspondiente a la unión de las dos piezas de la barra (ver fig. \ref{fig:cero-carrito}), próxima a su centro. El sentido positivo corresponde al alejamiento respecto del sensor ultrasónico.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\textwidth]{imagenes/cero-carrito.jpeg}
+        \caption{Posición $0 \text{cm}$ para el carrito.}
+        \label{fig:cero-carrito}
+    \end{figure}
+
+    El sensor mide la distancia $d$ hasta la cara del carrito más próxima a él. Para hallar la posición del centro teniendo $d$ se precisa conocer la longitud del carro. Para ello se midió con regla el largo del carrito, obteniéndose un valor de $l_c=(5,5 \pm 0,1)\,\text{cm}$.
+    Con el carrito quieto en la referencia se promediaron 100 lecturas con eco recibido, obteniéndose $d_0 \approx 15,612\,\text{cm}$, con lo cual: $p_0 = d_0 + \frac{l_c}{2} \approx 18,362 \ \text{cm}$. La posición se representa en el sistema mediante
+    \[
+        p=d + \frac{l_c}{2} - p_0 = x_p - p_0
+    \]
+
+    Para contrastar las lecturas se midió con regla la distancia $L$ desde el sensor hasta la cara más alejada del carrito. Por lo tanto, la distancia geométrica comparable con $d$ es $L-l_c$. En la referencia se obtuvo $L_0=21.7\,\text{cm}$, de modo que el desplazamiento independiente medido con regla es $p_{\text{regla}}=L-L_0$. La Tabla~\ref{tab:medicion_carrito} presenta los datos en el orden registrado. Las diferencias absolutas entre $d$ y $L-l_c$ pueden incluir diferencias en el origen físico de medición, así como errores propios a la hora de tomar las mediciones; no se aplicó una corrección adicional a los datos.
 
     \begin{table}[H]
         \centering
-        \label{tab:valores_limite}
+        \caption{Comparación de la posición del carrito obtenida con el sensor y con regla. Todas las distancias se expresan en centímetros.}
+        \label{tab:medicion_carrito}
+        \small
+        \begin{tabular}{rrrrrr}
+            \toprule
+            Punto & $L$ (regla) & $L-l_c$ & $d$ (sensor) & $p$ & $p_{\text{regla}}$ \\
+            \midrule
+            1  & 21.7 & 16.2 & 15.612 & 0.000   & 0.0 \\
+            2  & 18.0 & 12.5 & 12.121 & -3.491  & -3.7 \\
+            3  & 14.5 & 9.0  & 8.775  & -6.837  & -7.2 \\
+            4  & 11.5 & 6.0  & 5.531  & -10.081 & -10.2 \\
+            5  & 6.5  & 1  & 0.578  & -15.034  & -15.7 \\
+            6  & 20.0 & 14.5 & 14.170 & -1.442  & -1.7 \\
+            7  & 24.5 & 19.0 & 18.626 & 3.014   & 2.8 \\
+            8  & 28.6 & 23.1 & 22.809 & 7.197   & 6.9 \\
+            9  & 33.0 & 27.5 & 26.974 & 11.362  & 11.3 \\
+            10 & 37.3 & 31.8 & 31.055 & 15.443  & 15.6 \\
+            11 & 38.8 & 33.3 & 31.823 & 16.211  & 17.1 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    Para hallar el rango de valores de $p$ se extrajeron de los valores presentados en la Tabla \ref{tab:medicion_carrito} las posiciones en los extremos: para el límite inferior se acercó al carrito hacia el sensor hasta que hizo contacto con el broche que sostiene al propio sensor, obteniéndose que $p_{min} = -15.034 \ \text{cm}$ (correspondiente al punto $4$). Luego para el límite superior se alejó al carrito del sensor hasta estar al borde de caerse de la barra, donde se midió que $p_{max} = 16.211 \ \text{cm}$ (correspondiente al punto 11).
+
+    Por tanto el rango de posiciones observado verifica que:
+    \[
+        p\in[-15.034;16.211]\,\text{cm},
+    \]
+    correspondiente a $d\in[0.578; 31.823]\,\text{cm}$.
+    Para las mediciones se adopta el intervalo operativo
+    \[
+        p\in[-15;21]\,\text{cm},
+    \]
+    equivalente a $d\in[0.612;36.612]\,\text{cm}$, dado que $d=p+d_0$ y $d_0=15.612\,\text{cm}$. Estos límites son valores adoptados experimentalmente.
+    Como $p=d-d_0$, las posiciones más cercanas al sensor que la referencia tienen $p<0$, y las más alejadas tienen $p>0$; la distancia $d$ permanece positiva.\\
+
+
+    Se define el ángulo de la barra $\theta_b$ como su inclinación respecto de la horizontal, positiva en sentido antihorario. Se estima con la MPU6050 fijada a la barra mediante un filtro complementario con $\alpha=0.94$ y muestreo a $50\,\text{Hz}$. Con la barra horizontal y quieta en $u_0=1544\,\mu\text{s}$ se calibra el sesgo del giroscopio y se determina el offset angular, que se resta a la estimación para referirla al cero adoptado.
+
+    La Tabla~\ref{tab:valores_sistema} presenta los resultados del ensayo. En los extremos operativos se midieron $\theta_b=-16.71\degree$ para $1100\,\mu\text{s}$ y $\theta_b=17.87\degree$ para $2000\,\mu\text{s}$. Se adoptan estos valores como límites observados de inclinación en operación, $\theta_b\in[-16.71\degree; 17.87\degree]$. La restricción implementada consiste en saturar el comando del servo a $u\in[1100,2000]\,\mu\text{s}$. Los límites angulares corresponden a las mediciones realizadas en los extremos de comando para el montaje ensayado. No representan una medición de todos los topes mecánicos ni garantizan por sí solos la validez del modelo lineal en todo el intervalo.
+
+    \begin{table}[H]
+        \centering
+        \caption{Comandos aplicados, coordenadas nominales del servo e inclinación medida de la barra.}
+        \label{tab:valores_sistema}
+        \begingroup
+        \small
+        \setlength{\tabcolsep}{4pt}
+        \begin{tabular}{rrrrrr}
+            \toprule
+            $u$ & $\Delta u$ & $\theta_{\text{equiv}}$ & $\theta_{s,\text{nom}}$ & $\theta_b$ & Filtro sin \textit{offset} \\
+            $[\mu\text{s}]$ & $[\mu\text{s}]$ & [deg] & [deg] & [deg] & [deg] \\
+            \midrule
+            1100 & -444 & 53.92 & -43.06 & -16.71 & -18.91 \\
+            1200 & -344 & 63.62 & -33.36 & -13.00 & -15.15 \\
+            1300 & -244 & 73.32 & -23.66 & -9.40 & -11.58 \\
+            1400 & -144 & 83.02 & -13.97 & -5.48 & -7.67 \\
+            1600 & 56   & 102.41 & 5.43  & 2.29  & 0.10 \\
+            1700 & 156  & 112.11 & 15.13 & 6.18  & 3.99 \\
+            1800 & 256  & 121.81 & 24.83 & 10.22 & 8.03 \\
+            1900 & 356  & 131.51 & 34.53 & 14.15 & 11.96 \\
+            2000 & 456  & 141.21 & 44.22 & 17.87 & 15.68 \\
+            \bottomrule
+        \end{tabular}
+        \endgroup
+        \par\vspace{2mm}
+        {\raggedright\footnotesize\textit{Nota:} Se conservan las lecturas registradas. El comando $1000\,\mu\text{s}$ queda excluido por la colisión con el piso; se adopta $1100\,\mu\text{s}$ como mínimo operativo. Los ángulos del servo son nominales; $\theta_b$ es la estimación del filtro corregida por el offset.\par}
+    \end{table}
+
+    A modo de resúmen se presentan en la Tabla \ref{tab:valores_lim} los rangos considerados para las variables en cuestión:
+
+    \begin{table}[H]
+        \centering
         \begingroup
         \small
         \setlength{\tabcolsep}{4pt}
         \begin{tabular}{c|c}
-            \hline
+        \hline
             \textbf{Variable} & \textbf{Rango}\\\hline
             $u$ & $[1100 \ \mu\text{s}; 2000 \ \mu\text{s}]$\\\hline
-            $p$ & $[-10.081 \ \text{cm}; 16.211 \ \text{cm}]$\\\hline
+            $p$ & $[-15 \ \text{cm}; 21 \ \text{cm}]$\\\hline
             $\theta_b$ & $[-16.71\degree; 17.87\degree]$\\\hline
         \end{tabular}
         \endgroup
-        \caption{Valores límite a considerar}
+        \caption{Valores límite de las variables del sistema}
+        \label{tab:valores_lim}
         \par\vspace{2mm}
     \end{table}
-    
+
+    En la fig.~\ref{fig:sist_de_ref} se incluye un esquema con las variables y sus sentidos de referencia:
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.75\textwidth]{imagenes/ball_and_beam_servo.png}
+        \caption{Sistema de referencia de la planta}
+        \label{fig:sist_de_ref}
+    \end{figure}
+
+    \subsection{Procedimiento de modelado}
+    El modelado se abordó separando la planta en dos subsistemas en cascada: el conjunto servomotor--barra, cuya entrada es el comando del servo en $\mu\text{s}$ y cuya salida es la inclinación en grados de la barra, y el carrito, cuya entrada es dicha inclinación y cuya salida es la posición longitudinal. Para el primer subsistema se realizó una identificación experimental de una estructura de segundo orden. Para la transferencia $\frac{Y(s)}{\Theta_b(s)}$, se propuso inicialmente un modelo con un doble integrador, pero posteriormente fue descartado ya que no respondía adecuadamente al comportamiento del sistema real. Finalmente se propuso un modelo con un integrador y un polo estable asociado al rozamiento viscoso, el cual resultó más acorde a lo observado en la realidad.
+
+
+    \subsection{Identificación experimental del conjunto servomotor--barra}
+    \subsubsection{Datos y estructura del modelo discreto}
+    La adquisición se realizó con el programa \texttt{filtro\_complementario\_mpu6050\_v5\_excitacion.ino}, ubicado en \texttt{Practica3}. Se envió al servo mediante \texttt{writeMicroseconds()} la secuencia periódica de comandos $1544 \rightarrow 1750 \rightarrow 1544 \rightarrow 1350\,\mu\text{s}$, manteniendo cada nivel durante $1.5\,\text{s}$. Antes de iniciar la secuencia se mantuvo la barra horizontal con $1544\,\mu\text{s}$ y se calibraron el sesgo del giroscopio y el cero angular. Durante el ensayo se registraron por puerto serie el comando enviado, $u[k]$, y la inclinación de la barra, $\theta_b[k]$, estimada con la MPU6050 mediante el filtro complementario y corregida por el offset, con un período de muestreo $T_s=0.02\,\text{s}$.
+
+    El procedimiento se implementó en el script \texttt{TP2/estimar-planta.m}. Se utilizaron el comando aplicado al servomotor, $u[k]$, y el ángulo medido de la barra, $\theta_b[k]$, con un período de muestreo $T_s=0.02\,\text{s}$. Se descartaron los datos anteriores a $t=5\,\text{s}$ para excluir el arranque. Los datos restantes se dividieron temporalmente: las primeras 2076 muestras (75\,\%) se destinaron a la estimación y las últimas 693 muestras (25\,\%) se reservaron para la validación.
+
+    Para identificar la dinámica se restaron las medias calculadas exclusivamente sobre el tramo de entrenamiento:
+    \[
+        \widetilde u[k]=u[k]-\overline u_{\mathrm{est}},\qquad
+        \widetilde\theta_b[k]=\theta_b[k]-\overline\theta_{b,\mathrm{est}}.
+    \]
+    Estas medias son referencias utilizadas para centrar los datos de identificación.
+
+    Se propuso la siguiente ecuación en diferencias
+    \begin{equation}
+        \widetilde\theta_b[k]=a_1\widetilde\theta_b[k-1]
+        +a_2\widetilde\theta_b[k-2]+b\widetilde u[k-2],
+        \label{eq:regresion_servo}
+    \end{equation}
+    y se estimaron los tres coeficientes mediante mínimos cuadrados. La entrada aparece desplazada dos muestras, equivalentes a $0.04\,\text{s}$, visto que el servo no responde en seguida a un cambio en la entrada. El resultado fue
+    \begin{equation}
+        G_{sb,d}(z)=\frac{\widetilde\Theta_b(z)}{\widetilde U(z)}
+        =\frac{0.01504}{z^2-0.7667z+0.1618}
+        =\frac{0.01504z^{-2}}{1-0.7667z^{-1}+0.1618z^{-2}}.
+        \label{eq:servo_discreto_identificado}
+    \end{equation}
+
+    \subsubsection{Representación continua de segundo orden}
+    A partir de los polos discretos $z_i$ se calcularon los parámetros $p_i=-\log(z_i)/T_s$ (usando un mapeo exponencial de los polos), de modo que los polos continuos son $-p_i$. Se conservó además la ganancia estática $K=G_{sb,d}(1)$, obteniéndose
+    \[
+        K=0.038054815\,\frac{\degree}{\mu\text{s}},\qquad
+        p_{1,2}=45.537277\pm j\,15.381455\,\text{s}^{-1}.
+    \]
+    La representación continua construida con estos polos y esta ganancia es
+    \begin{equation}
+        G_{sb,c}(s)=\frac{Kp_1p_2}{(s+p_1)(s+p_2)}
+        =\frac{87.92}{s^2+91.07s+2310}.
+        \label{eq:servo_continuo_identificado}
+    \end{equation}
+    Los dos polos son estables. Esta conversión conserva los polos y la ganancia estática, pero no garantiza una equivalencia exacta de las respuestas temporales discreta y continua. 
+
+    \subsubsection{Validación con datos reservados}
+    Se simuló el modelo discreto en forma libre con la entrada registrada, sin reemplazar recursivamente su salida por las mediciones. La simulación comenzó al inicio del registro recortado, con condiciones iniciales nulas en las variables centradas, y continuó hasta el tramo de validación para conservar la historia de entrada. Finalmente se restituyó la media angular de entrenamiento.
+
+    Sobre las últimas 693 muestras, no utilizadas en la regresión, se obtuvo
+    \[
+        \mathrm{RMSE}=0.453553\degree,\qquad \mathrm{FIT}=91.28\,\%.
+    \]
+    Las métricas se calcularon como
+    \[
+        \mathrm{RMSE}=\sqrt{\frac{1}{N_v}\sum_{k\in\mathcal V}
+        \bigl(\theta_b[k]-\widehat\theta_b[k]\bigr)^2},\qquad
+        \mathrm{FIT}=100\left(1-
+        \frac{\|\theta_b-\widehat\theta_b\|_2}
+        {\|\theta_b-\overline\theta_{b,\mathcal V}\|_2}\right),
+    \]
+    donde $\mathcal V$ es el conjunto de muestras de validación y $N_v=693$. El resultado respalda el uso del modelo discreto para representar la dinámica comando--ángulo bajo las condiciones del ensayo. Estas métricas corresponden exclusivamente a $G_{sb,d}(z)$; no se atribuyen al modelo continuo ni a la planta completa con el carrito.
+
+    Por otro lado, en la fig. \ref{fig:validacion_servo_barra} se graficó también la respuesta a la entrada de la planta contínua estimada con la respuesta real de la planta.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{imagenes/tf_servo_barra_real_vs_modelo.png}
+        \caption{Comparación experimental del modelo identificado del conjunto servomotor--barra}
+        \label{fig:validacion_servo_barra}
+    \end{figure}
+
+    Se puede observar que la planta estimada representa a la planta real con gran exactitud.
+    \subsubsection{Comparación del subsistema con retardo adicional}
+    Se comparó la representación continua con dos alternativas que conservan exactamente sus polos y ganancia y agregan únicamente un retardo fijo:
+    \[
+        G_{sb,c,T_d}(s)=G_{sb,c}(s)e^{-T_ds},
+        \qquad T_d\in\{0.02,0.04\}\,\text{s}.
+    \]
+    Se emplearon la misma entrada registrada y el mismo tramo de validación del último 25\,\% de las muestras. La Tabla~\ref{tab:validacion_servo_retardo} resume los resultados.
+
+    \begin{table}[H]
+        \centering
+        \caption{Validación del conjunto servomotor--barra con y sin retardo adicional.}
+        \label{tab:validacion_servo_retardo}
+        \begin{tabular}{lrr}
+            \toprule
+            Modelo & RMSE [$\degree$] & FIT [\%] \\
+            \midrule
+            Discreto $G_{sb,d}(z)$ & 0.453553 & 91.28 \\
+            Continuo $G_{sb,c}(s)$ & 0.423600 & 91.85 \\
+            Continuo con $T_d=0.02\,\text{s}$ & 0.598778 & 88.48 \\
+            Continuo con $T_d=0.04\,\text{s}$ & 1.111370 & 78.63 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    El modelo continuo sin retardo adicional presentó el menor RMSE y el mayor FIT. Agregar $20\,\text{ms}$ o $40\,\text{ms}$ deterioró la concordancia con las mediciones. Por lo tanto, se selecciona la Ecuación~\eqref{eq:servo_continuo_identificado}, sin retardo adicional, como modelo continuo de trabajo del conjunto servomotor--barra. 
+
+    \subsubsection{Alcance del modelo seleccionado}
+    La identificación experimental permitió representar la dinámica efectiva del conjunto sin medir por separado inercias, parámetros eléctricos y geometría del mecanismo. Su limitación es que la validez depende de las condiciones y de la excitación del ensayo; un buen ajuste comando--ángulo no demuestra por sí solo que el modelo del carrito o su conexión en cascada sean adecuados.
+
+    \subsection{Identificación experimental de la dinámica del carrito}
+    Se realizaron ensayos sin realimentación de posición, aplicando pulsos de comando al servo respecto de $u_0=1544\,\mu\text{s}$ y retornando entre ellos al comando de horizontalidad. El programa \texttt{dinamica-carrito.ino}, ubicado en \texttt{TP2/Codigos Arduino/dinamica-carrito}, comienza con $3\,\text{s}$ en horizontal y alterna incrementos positivos de $70$, $85$, $95$ y $100\,\mu\text{s}$ y negativos de $-50$, $-60$ y $-65\,\mu\text{s}$, con duraciones variables entre $1$ y $2.2\,\text{s}$ y descansos de $2\,\text{s}$ en horizontal. Para las mediciones se consideró un intervalo operativo de $d \in [0.612;36.612]\,\text{cm}$, el cual corresponde a $ p\in[-15;21]\,\text{cm}$. El ensayo se interrumpe ante pérdida de eco o salida del intervalo operativo descripto anteriormente.
+
+    Se registraron solamente el ángulo de la barra estimado con el filtro complementario y la distancia ultrasónica, a $50\,\text{Hz}$. Para identificar el carrito se utilizó como entrada el ángulo medido, en grados, y como salida $y=d-15.612\,\text{cm} = d + \frac{l_c}{2} - d_0 - \frac{l_c}{2} = x_p - p_0$. Por lo tanto, los pulsos del servo constituyen la excitación del ensayo, pero no se los supone iguales a escalones ideales de inclinación.
+
+    \subsubsection{Estructura y procedimiento de ajuste}
+    %Se propuso el modelo efectivo
+    %\begin{equation}
+    %    \ddot y=K_c\theta_b-a_c\dot y+c,
+    %    \qquad G_c(s)=\frac{Y(s)}{\Theta_b(s)}=\frac{K_c}{s(s+a_c)},
+    %    \label{eq:carrito_identificado_estructura}
+    %\end{equation}
+    %donde la transferencia describe la parte lineal con condiciones iniciales nulas y sin el término constante $c$. El integrador representa la relación entre velocidad y posición, mientras que $a_c$ representa un amortiguamiento viscoso efectivo. Esta estructura no identifica por separado masas, inercias ni coeficientes de fricción de cada componente.
+
+    Para modelar la dinámica del carrito se planteó la 2° Ley de Newton sobre el eje de la barra, de manera que:
+    \begin{equation}
+        m \cdot g \cdot sen(\theta_b) - b \cdot \dot y = m \cdot \ddot{y}
+    \end{equation}
+
+    Luego utilizando la aproximación para ángulos chicos de $sin(\theta_b) \approx \theta_b$ (en radianes) y dividiendo todo por la masa del carrito $m$, se obtiene que:
+    \begin{equation}
+        g \cdot \theta_b - \frac{b}{m} \cdot \dot y = \ddot{y}
+    \end{equation}
+
+    De donde, luego de aplicar la transformada de Laplace, se obtuvo la siguiente transferencia:
+    \begin{equation}
+        G_c(s) = \frac{Y(s)}{\Theta_b(s)} = \frac{g}{s(s+\frac{b}{m})} = \frac{K_c}{s(s+a_c)},
+    \end{equation}
+
+    El script \texttt{TP2/estimar\_dinamica\_carrito.m} seleccionó el tramo continuo más largo con mediciones finitas y posiciones dentro del intervalo operativo. En la corrida analizada correspondió a las filas 256 a 1190, entre $5.100$ y $23.780\,\text{s}$: 935 muestras, de las cuales 701 se utilizaron para estimar y 234 para validar. Se excluyeron 255 muestras fuera de ese tramo. No se concatenaron segmentos separados ni se diferenciaron las mediciones de posición.
+
+    Se minimizó el error cuadrático de posición simulada en entrenamiento. Para cada $a_c\geq0$ se integró el modelo con retención de orden cero del ángulo entre muestras y se ajustaron por mínimos cuadrados $K_c$, la posición inicial y la velocidad inicial. El polo se seleccionó mediante un barrido y refinamiento escalar, sin utilizar las muestras de validación. No se restó la media del ángulo, ya referido a la horizontal. Se obtuvo
+    \[
+        K_c=50.389071\,\frac{\text{cm}}{\degree\,\text{s}^2},\qquad
+        a_c=8.4596013\,\text{s}^{-1}, %\qquad
+        %c=-10.847171\,\frac{\text{cm}}{\text{s}^2},
+    \]
+    con $\widehat y(0)=-11.2313\,\text{cm}$ y $\widehat v(0)=43.8311\,\text{cm/s}$. Estas condiciones iniciales son variables del ajuste, no mediciones independientes; en particular, la posición inicial ajustada queda dentro del intervalo operativo adoptado. %El término $c$ puede absorber un error de cero angular u otros efectos no representados y no se interpreta como una fuerza física identificada por separado.
+
+    La transferencia adoptada para el carrito es
+    \begin{equation}
+        G_c(s)=\frac{50.389071}{s(s+8.4596013)}.
+        \label{eq:carrito_transferencia}
+    \end{equation}
+    \subsubsection{Validación y alcance}
+    La simulación se propagó desde el inicio del tramo seleccionado hasta su final, sin reiniciar estados ni ajustar parámetros con la validación. 
+    %Se comparó con un doble integrador estimado mediante el mismo procedimiento:
+    \begin{center}
+    \begin{tabular}{lrr}
+        \toprule
+        Modelo & RMSE [cm] & FIT [\%] \\
+        \midrule
+        Integrador y polo viscoso & 2.95387 & -2.44 \\
+        %Doble integrador & 3.00498 & -4.21 \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    %La mejora al incorporar el polo viscoso es pequeña y el FIT negativo indica que la predicción de posición en ese tramo es peor que su media constante. Por ello, esta validación aislada no acredita una reproducción precisa del carrito. Sin embargo, al utilizar los parámetros obtenidos se observó una concordancia cualitativa razonable entre el comportamiento simulado y el real de la planta completa. Se adopta por esa razón como modelo aproximado de trabajo, sin atribuirle una validación cuantitativa adicional que no se ha documentado. La estabilidad observada del sistema controlado es compatible con su utilidad para diseño, pero no demuestra por sí sola la exactitud del modelo.
+
+    El FIT negativo indica que la predicción de posición en ese tramo es peor que su media constante. Por ello, esta validación aislada no acredita una reproducción precisa del carrito. Sin embargo, al utilizar los parámetros obtenidos se observó una concordancia cualitativa razonable entre el comportamiento simulado y el real de la planta completa. Se adopta por esa razón como modelo aproximado de trabajo, sin atribuirle una validación cuantitativa adicional que no se ha documentado. La estabilidad observada del sistema controlado es compatible con su utilidad para diseño, pero no demuestra por sí sola la exactitud del modelo.
+
+    \subsection{Modelo de la planta completa}
+    \subsubsection{Transferencia entrada--salida}
+    Al conectar ambos subsistemas en cascada, la entrada es $\Delta u=u-u_0$, en microsegundos, y la salida incremental es la posición respecto de la referencia central adoptada. Utilizando los coeficientes redondeados del servo, se obtuvo la siguiente transferencia linealizada alrededor del equilibrio:
+    \begin{equation}
+        G_P(s)=\frac{\Delta Y(s)}{\Delta U(s)}
+        =\frac{87.92\cdot50.389071}
+        {(s^2+91.07s+2310)\,s(s+8.4596013)}.
+        \label{eq:planta_completa}
+    \end{equation}
+    El ángulo intermedio se expresa en grados en ambos modelos: no corresponde aplicar nuevamente un factor de conversión de grados a radianes ni multiplicar por la gravedad. La planta tiene un polo en el origen y tres polos con parte real negativa; no es asintóticamente estable en lazo abierto.
+
+    \subsubsection{Representación en variables de estado}
+    Una realización de la parte lineal sin retardo se obtiene con
+    $x=[\delta y\;\delta\dot y\;\delta\theta_b\;\delta\dot\theta_b]^\mathsf{T}$:
+    \begin{equation}
+        \dot x=Ax+B\delta u,\qquad \delta y=Cx+D\delta u,
+    \end{equation}
+    \[
+        A=\begin{bmatrix}
+            0&1&0&0\\
+            0&-8.4596013&50.389071&0\\
+            0&0&0&1\\
+            0&0&-2310&-91.07
+        \end{bmatrix},\quad
+        B=\begin{bmatrix}0\\0\\0\\87.92\end{bmatrix},\quad
+        C=\begin{bmatrix}1&0&0&0\end{bmatrix},\quad D=0.
+        \label{eq:estados_planta}
+    \]
+    %Las unidades de los estados son, respectivamente, cm, cm/s, grados y grados/s. Esta representación usa coordenadas incrementales y omite el sesgo constante del ajuste. Si se conserva $c$ en las coordenadas originales, el modelo es afín y aparece el vector adicional $[0\;c\;0\;0]^\mathsf{T}$. En ese modelo afín, el reposo exige $\theta_{b,e}=-c/K_c\simeq0.2153\degree$, que no coincide exactamente con la horizontal calibrada. Por ello, el modelo lineal se adopta como aproximación local alrededor de la horizontal y la referencia central; el sesgo ajustado no prueba que ese punto sea un equilibrio exacto del modelo afín. La referencia de posición utilizada es la definida experimentalmente y no una medición del centro geométrico exacto.
+
+    Las unidades de los estados son, respectivamente, cm, cm/s, grados y grados/s. El modelo lineal se adopta como aproximación local alrededor de la horizontal y la referencia central. La referencia de posición utilizada es la definida experimentalmente y no una medición del centro geométrico exacto.
+
+    \subsubsection{Alternativa con retardo fijo}
+    La alternativa exigida para el servo conserva sus polos y ganancia y agrega solamente un retardo. En la planta completa resulta
+    \[
+        G_{P,T_d}(s)=G_P(s)e^{-T_ds}.
+    \]
+    Las comparaciones anteriores con $T_d=0.02$ y $0.04\,\text{s}$ corresponden exclusivamente a comando--ángulo. Se mantiene provisionalmente la opción sin retardo adicional, que fue la de mejor ajuste en ese subsistema y se utilizó como modelo de trabajo. Para completar la comparación exigida por la consigna resta documentar la respuesta comando--posición de la planta completa con y sin retardo, empleando la misma entrada, condiciones iniciales y criterio de error. No se extrapolan los valores de RMSE y FIT del servo a esta comparación. El retardo puro exacto tampoco está incluido en la realización finita de cuatro estados anterior.
+
+    \subsubsection{Ventajas y limitaciones del modelado experimental}
+    La identificación por subsistemas permite obtener una representación sencilla sin medir masas, inercias ni geometría detallada, y separar la respuesta del actuador de la del carrito. A cambio, los parámetros dependen del montaje, del rango de excitación, de la calibración y de los sensores utilizados. El modelo lineal no representa explícitamente fricción estática o de Coulomb, holguras, saturaciones ni fallos de eco. Su uso se limita a movimientos próximos a las condiciones ensayadas y debe contrastarse con nuevos ensayos antes de generalizar sus predicciones.
+
+    \section{Limitaciones de diseño}
+    La transferencia obtenida del sistema no presenta singularidades en el semiplano derecho, con lo cual no impone cotas inferiores o superiores a la frecuencia de cruce $w_{gc}$. Sin embargo, el ancho de banda del lazo de control se encuentra limitado principalmente por la frecuencia de muestreo y control de $50$ Hz. Dado que no se puede controlar un sistema a una frecuencia mayor a la que se obtienen nuevos datos de los sensores, la dinámica del lazo deberá permanecer por debajo de este valor.
+
+    Por otro lado, a la hora de diseñar los controladores deberá tenerse en consideración que la acción de control no se sature respecto de los límites establecidos previamente, de manera que $u \in [1100 \ \mu\text{s}; 2000 \ \mu\text{s}]$. Para ello se deberá ajustar la ganancia de los controladores a un valor acorde que no provoque acciones de control demasidado violentas.\\
+
+    En cuanto al diseño existe también una relación de compromiso entre la velocidad de respuesta y la robustez y estabilidad del lazo. Generalmente, para alcanzar una mayor velocidad de respuesta se requiere una $w_{gc}$ mayor, lo cual implica aumentar la ganancia del controlador. Pero esto a su vez implica que tanto el margen de fase como el de ganancia disminuirán, debido a la ganancia extra, lo cual degrada la estabilidad del sistema y vuelve al lazo menos robusto ante perturbaciones. Así mismo, una mayor ganancia de controlador suele implicar acciones de control más violentas, lo cual puede ocasionar que la misma exceda los límites permitidos, potencialmente dañando alguno de los actuadores o componentes del sistema.
+
+    \section{Diseño de controladores}
+
+    \end{document}
+
+
+

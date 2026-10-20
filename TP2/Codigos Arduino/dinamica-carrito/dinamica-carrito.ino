@@ -1,8 +1,11 @@
 ﻿/* Ensayo SIN PD a 50 Hz. Calibracion inicial: 2 s quieto y horizontal.
- * Trama a 115200: "abcd" + [angulo_filtro_deg, distancia_cm].
- * SOLO dos float32 little endian: 12 bytes con cabecera, sin texto.
- * Configurar receptor para DOS single, no tres. Distancia -1: sin eco.
- * p = distancia - 15.612 cm. Limites p: [-9,15] cm, del informe.
+ * Trama a 115200: "abcd" + [angulo_filtro_deg, distancia_cm, comando_us].
+ * Tres float32 little endian: 16 bytes con cabecera, sin texto.
+ * Configurar receptor para TRES single (12 bytes de datos). Distancia -1: sin eco.
+ * d1: angulo; d2: distancia; d3: comando absoluto enviado al servo.
+ * Comando actualizado despues de medir: entrada retenida hasta la muestra siguiente.
+ * Tiempo del receptor: muestras a 50 Hz, t=0 en la primera trama.
+ * p = distancia - 15.612 cm. Limites p: [-15,21] cm.
  * Medir primero y aplicar comando despues; IMU y eco separados unos ms.
  * 3 s horizontal + 12 pulsos de 1 s con descansos de 2 s + 6 s final.
  * Sin PD, rampas ni retorno automatico. Maximo 45 s desde primera trama.
@@ -33,12 +36,12 @@ const float POSICION_MIN_CM = -15.0f, POSICION_MAX_CM = 21.0f;
 struct Escalon { int16_t deltaUs; uint16_t muestras; };
 const Escalon SECUENCIA[] = {
   {0, 150},
-  {85, 50}, {0, 100}, {-60, 100}, {0, 100},
-  {85, 65}, {0, 100}, {-65, 80}, {0, 100},
-  {95, 60}, {0, 100}, {-60, 110}, {0, 100},
-  {100, 50}, {0, 100}, {-60, 90}, {0, 100},
-  {85, 70}, {0, 100}, {-50, 90}, {0, 100},
-  {70, 80}, {0, 100}, {-50, 110}, {0, 100},
+  {80, 50}, {0, 100}, {-65, 40}, {0, 100},
+  {75, 50}, {0, 100}, {-60, 40}, {0, 100},
+  {90, 50}, {0, 100}, {-75, 40}, {0, 100},
+  {100, 50}, {0, 100}, {-70, 40}, {0, 100},
+  {65, 50}, {0, 100}, {-50, 40}, {0, 100},
+  {70, 50}, {0, 100}, {-60, 40}, {0, 100},
   {0, 300}
 };
 const uint8_t N_ESCALONES = sizeof(SECUENCIA) / sizeof(SECUENCIA[0]);
@@ -97,14 +100,15 @@ float medirDistancia() {
 }
 
 void enviarTrama(float distancia) {
-  if (Serial.availableForWrite() < 12 ||
+  if (Serial.availableForWrite() < 16 ||
       (int32_t)(siguienteUs - micros()) < 2500) {
     detener(); // No esperar a la UART ni alterar la grilla de muestreo.
     return;
   }
-  uint8_t trama[12] = {'a', 'b', 'c', 'd'};
-  const float valores[] = {anguloFiltrado - offsetAngulo, distancia};
-  for (uint8_t i = 0; i < 2; ++i) {
+  uint8_t trama[16] = {'a', 'b', 'c', 'd'};
+  // pulsoUs tambien se actualiza a horizontal en detener().
+  const float valores[] = {anguloFiltrado - offsetAngulo, distancia, (float)pulsoUs};
+  for (uint8_t i = 0; i < 3; ++i) {
     uint32_t bits;
     memcpy(&bits, &valores[i], 4);
     for (uint8_t j = 0; j < 4; ++j)
