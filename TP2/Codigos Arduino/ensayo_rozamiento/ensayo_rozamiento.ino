@@ -92,7 +92,7 @@ void setup() {
 #endif
   if (!mpu.begin(0x68)) fallo();
   mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
-  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setGyroRange(MPU6050_RANGE_2000_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_44_HZ);
   // Barra inmovil: calibrar gyro, sin redefinir como horizontal su inclinacion.
   delay(1000);

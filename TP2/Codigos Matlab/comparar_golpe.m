@@ -58,8 +58,10 @@ assert(numel(a)<=3 && numel(b)<=3,'La recurrencia Arduino admite orden hasta dos
 a(end+1:3)=0; b(end+1:3)=0;
 fprintf('Arduino: A1=%.9g A2=%.9g B0=%.9g B1=%.9g B2=%.9g\n', ...
     -a(2),-a(3),b(1),b(2),b(3));
-planta=ss([0 1 0 0;0 -5.7317425 19.619739 0; ...
-    0 0 0 1;0 0 -2310 -91.07],[0;0;0;87.92],[1 0 0 0],0);
+% Misma dinamica nominal de carrito y servo que en disenar_control.m.
+% Estados: posicion, velocidad, angulo y velocidad angular; sesgo c=0.
+planta=ss([0 1 0 0;0 -6.815007 24.428153 0; ...
+    0 0 0 1;0 0 -967.5 -50.12],[0;0;0;36.82],[1 0 0 0],0);
 pd=c2d(planta,Ts,'zoh');
 assert(isstable(feedback(Cz*tf(pd),1)),'El lazo digital nominal es inestable.');
 ts=(0:Ts:ceil(max(ta)/Ts)*Ts)';
@@ -86,7 +88,7 @@ disp(comparacion);
 fprintf('Salto simulado: %.2f cm/s; saturaciones simuladas: %d.\n',saltoVelocidad,saturadas);
 fprintf('Posicion inicial mediana real: %.4f cm. No se resta de las curvas.\n',yBase);
 fprintf('La amplitud del impulso real no esta medida; la comparacion es cualitativa.\n');
-fig=figure('Color','white','Name',['Golpe: ' char(nombre)]);
+figure('Color','white','Name',['Golpe: ' char(nombre)]);
 subplot(2,1,1);
 plot(ta,r,':k',ta,y,'b',ts,ys,'--r'); hold on; grid on;
 xline(0,':'); yline(0.2,':'); yline(-0.2,':');
@@ -96,13 +98,9 @@ stairs(ta,u,'b'); hold on; stairs(ts,us,'--r'); grid on;
 yline(1100,':'); yline(2000,':');
 xlabel('Tiempo desde el inicio seleccionado [s]'); ylabel('Pulso [us]');
 legend('Real','Simulado','Location','best');
-prefijo=fullfile(carpeta,['comparacion_golpe_' char(matlab.lang.makeValidName(nombre))]);
 resultado=struct('comparacion',comparacion,'instanteGolpe',instanteGolpe, ...
     'inicioAutomatico',automatico,'saltoVelocidad',saltoVelocidad, ...
     't',ta,'r',r,'y',y,'u',u,'ts',ts,'ys',ys,'us',us,'Cz',Cz);
-save([prefijo '.mat'],'resultado');
-writetable(comparacion,[prefijo '.csv'],'WriteRowNames',true);
-exportgraphics(fig,[prefijo '.png'],'Resolution',180);
 end
 
 function m=metricas(t,y,u)

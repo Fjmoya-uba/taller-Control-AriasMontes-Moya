@@ -16,7 +16,7 @@ velocidad_inicial = 0;               % Carrito inicialmente en reposo
 
 %% 2. Buscar el bloque mas largo de mediciones validas consecutivas
 valida = isfinite(angulo) & isfinite(posicion) & ...
-    posicion >= -15 & posicion <= 21 & tiempo <= 34.66;
+    posicion >= -15 & posicion <= 21 & tiempo <= 31.8;
 
 % Recorrer las muestras sin pegar bloques separados por datos invalidos.
 inicio_actual = 1;

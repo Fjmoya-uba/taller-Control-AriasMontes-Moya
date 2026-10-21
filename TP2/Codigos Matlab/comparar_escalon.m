@@ -1,14 +1,9 @@
-function resultado = comparar_escalon_P(archivo, C, nombre)
+function resultado = comparar_escalon(archivo, C, nombre)
 % Comparador de escalon para P, PI y PD filtrado (nombre historico).
 % Sin argumentos conserva el ensayo P original.
 % PI: comparar_escalon_P('controlador_PI.mat', ...
 %         zpk(-0.5,0,db2mag(22)), 'PI')
 % C debe ser el controlador CONTINUO usado en el ensayo, no Cz.
-if nargin<1, archivo='controlador_proporcional.mat'; end
-if nargin<2, C=19.95262315; end
-if nargin<3, nombre='P'; end
-carpeta=fileparts(mfilename('fullpath'));
-if ~isfile(archivo), archivo=fullfile(carpeta,archivo); end
 s = load(archivo);
 o = s.out;
 % Protocolo del sketch: referencia absoluta, distancia absoluta, pulso us.
@@ -27,7 +22,7 @@ y(~valida) = NaN;
 fprintf('Escalon real: %.4f -> %.4f cm; muestras invalidas: %d\n', ...
     r(inicio-1), r(inicio), sum(~valida));
 
-%% Tustin del controlador y ZOH de la planta, igual que disenar_control.m
+% Tustin del controlador y ZOH de la planta, igual que disenar_control.m
 Ts = 0.02;
 C=tf(C);
 assert(C.Ts==0 && isproper(C), 'Pasar un controlador continuo propio (PD filtrado).');
@@ -37,8 +32,10 @@ assert(numel(a)<=3 && numel(b)<=3, 'Arduino admite orden hasta dos.');
 b(end+1:3)=0; a(end+1:3)=0;
 fprintf('Arduino: A1=%.9g A2=%.9g B0=%.9g B1=%.9g B2=%.9g\n', ...
     -a(2),-a(3),b(1),b(2),b(3));
-planta = ss([0 1 0 0; 0 -5.7317425 19.619739 0; ...
-    0 0 0 1; 0 0 -2310 -91.07], [0;0;0;87.92], [1 0 0 0], 0);
+% Misma dinamica nominal de carrito y servo que en disenar_control.m.
+% Estados: posicion, velocidad, angulo y velocidad angular; sesgo c=0.
+planta = ss([0 1 0 0; 0 -6.815007 24.428153 0; ...
+    0 0 0 1; 0 0 -967.5 -50.12], [0;0;0;36.82], [1 0 0 0], 0);
 pd = c2d(planta, Ts, 'zoh');
 assert(isstable(feedback(Cz*tf(pd),1)), 'El lazo digital nominal es inestable.');
 ts = (0:Ts:ceil(max(t)/Ts)*Ts)';
@@ -80,7 +77,7 @@ rmse_cm = sqrt(mean((y(post)-prediccion).^2, 'omitnan'));
 fprintf('RMSE real-simulacion: %.4f cm\n', rmse_cm);
 fprintf('Muestras saturadas en simulacion: %d\n',saturadas);
 
-fig = figure('Color','white','Name',[char(nombre) ': escalon real vs simulado']);
+figure('Color','white','Name',[char(nombre) ': escalon real vs simulado']);
 subplot(2,1,1);
 plot(t,r,':k',t,y,'b',ts,ys,'--r'); grid on; hold on;
 yline(10.2, ':', 'Banda 2 %'); yline(9.8, ':');
@@ -94,10 +91,6 @@ legend('Real','Simulado','Location','best');
 resultado=struct('comparacion',comparacion,'rmse_cm',rmse_cm, ...
     't',t,'r',r,'y',y,'u',u,'ts',ts,'ys',ys,'us',us, ...
     'C',C,'Cz',Cz,'saturadas',saturadas);
-prefijo=fullfile(carpeta,['comparacion_escalon_' char(matlab.lang.makeValidName(nombre))]);
-save([prefijo '.mat'],'resultado');
-writetable(comparacion,[prefijo '.csv'],'WriteRowNames',true);
-exportgraphics(fig,[prefijo '.png'],'Resolution',180);
 end
 
 function m = metricas(t,y,objetivo,u)

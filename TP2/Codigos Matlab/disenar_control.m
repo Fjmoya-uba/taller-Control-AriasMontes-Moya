@@ -4,32 +4,36 @@ clear; clc; close all;
 
 %% Modelización de la planta total
 
-p = [ 0 -5.7317425];
+p = [ 0 -6.815007];
 z = [];
-k = 19.619739;
+k = 24.428153;
 
-G_carrito = zpk(z1,p1,k1)
+G_carrito = zpk(z,p,k)
 
 s = tf("s");
-G_servo_barra = 87.92/(s^2 + 91.07*s + 2310)
+G_servo_barra = 36.82/(s^2 + 50.12*s + 967.5)
 
 % Conecto en cascada la dinamica del servo y la del carrito.
 
-H = minreal(G_servo_barra * G_carrito);
+H = minreal(G_servo_barra * G_carrito)
 
+%%
+figure();
 bode(H); grid on;
+title('Bode de la Planta Total');
 
 
 %% Vamos con el controlador
 
-nombre_controlador = 'PD'; % Cambiar tambien al ensayar P o PD (nombres de salida).
+nombre_controlador = 'PI'; % Cambiar tambien al ensayar P o PD (nombres de salida).
 z = [-3]; 
 p = [-6];
 k = db2mag(24);
 C = zpk(z, p, k);
 
 CP = minreal(H*C);
-bode(CP); grid on;
+figure(); bode(CP); grid on;
+title('Bode de la Planta con un Controlador tipo PD');
 
 %% Lazo cerrado de posición
 T = feedback(CP, 1);
@@ -113,9 +117,9 @@ c_simulacion = 0;           % cm/s^2
 
 % Modelo de estados: posicion, velocidad, angulo, velocidad angular.
 % Dos entradas: variacion de pulso y aceleracion externa constante.
-planta = ss([0 1 0 0; 0 -5.7317425 19.619739 0; ...
-    0 0 0 1; 0 0 -2310 -91.07], ...
-    [0 0; 0 1; 0 0; 87.92 0], [1 0 0 0], [0 0]);
+planta = ss([0 1 0 0; 0 -6.815007 24.428153 0; ...
+    0 0 0 1; 0 0 -967.5 -50.12], ...
+    [0 0; 0 1; 0 0; 36.82 0], [1 0 0 0], [0 0]);
 planta_digital = c2d(planta, Ts, 'zoh');
 
 %% Escalon de 0.1 m = 10 cm

@@ -21,16 +21,16 @@ const float REFERENCIA_CM = 15.612f;
 constexpr float POSICION_MIN_CM = -15.0f, POSICION_MAX_CM = 21.0f;
 // Consigna relativa al cero fisico. La telemetria conserva distancias absolutas.
 // true: escalon automatico; false: referencia cero para aplicar un golpe.
-constexpr bool ENSAYO_ESCALON = true;
+constexpr bool ENSAYO_ESCALON = false;
 constexpr uint32_t INSTANTE_ESCALON_MS = 5000UL;
 constexpr float CONSIGNA_POSICION_CM = 10.0f; // 0.1 m = 10 cm.
 float referenciaPosicion_cm = 0.0f;
 uint32_t inicioEnsayo_ms;
 // C(z) en forma directa: salida incremental [us], error [cm].
-const float COEF_A1 = 0.886792f;
+const float COEF_A1 = 0.886792453f;
 const float COEF_A2 = 0.0f;
-const float COEF_B0 = 61.310006f;
-const float COEF_B1 = -57.738549f;
+const float COEF_B0 = 15.4003772f;
+const float COEF_B1 = -14.5032679f;
 const float COEF_B2 = 0.0f;
 constexpr float SIGNO_CONTROL = 1.0f;
 // Discretizacion bilineal (Tustin) en MATLAB, con Ts = 0.02 s:

@@ -36,12 +36,12 @@ const float POSICION_MIN_CM = -15.0f, POSICION_MAX_CM = 21.0f;
 struct Escalon { int16_t deltaUs; uint16_t muestras; };
 const Escalon SECUENCIA[] = {
   {0, 150},
-  {80, 50}, {0, 100}, {-65, 40}, {0, 100},
-  {75, 50}, {0, 100}, {-60, 40}, {0, 100},
-  {90, 50}, {0, 100}, {-75, 40}, {0, 100},
-  {100, 50}, {0, 100}, {-70, 40}, {0, 100},
-  {65, 50}, {0, 100}, {-50, 40}, {0, 100},
-  {70, 50}, {0, 100}, {-60, 40}, {0, 100},
+  {100, 30}, {0, 150}, {-70, 30}, {0, 150},
+  {120, 30}, {0, 150}, {-75, 25}, {0, 150},
+  {115, 40}, {0, 150}, {-75, 30}, {0, 150},
+  {105, 50}, {0, 150}, {-70, 30}, {0, 150},
+  {85, 70}, {0, 150}, {-50, 30}, {0, 150},
+  {95, 50}, {0, 150}, {-60, 30}, {0, 150},
   {0, 300}
 };
 const uint8_t N_ESCALONES = sizeof(SECUENCIA) / sizeof(SECUENCIA[0]);
@@ -140,8 +140,8 @@ void setup() {
     detener();
     while (true) {}
   }
-  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
+  mpu.setGyroRange(MPU6050_RANGE_2000_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_44_HZ);
 
   // 100 muestras a 20 ms: ~2 s en centro, sin transmision ni excitacion.

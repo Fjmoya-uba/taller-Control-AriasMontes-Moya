@@ -3,7 +3,7 @@
 clear; clc; close all;
 
 %% 1. Datos y division temporal
-S = load('mediciones_y_u.mat');
+S = load('mediciones_servo_planta.mat');
 y = double(S.out.d1(:));       % Salida medida
 u = double(S.out.d2(:));       % Entrada al servo
  t = double(S.out.tout(:));
@@ -122,7 +122,7 @@ title('Salida Medida del Sistema');
 
 
 %% 6. Gráficos comparativos unificados
-figure('Name', 'Comparación del Modelo vs Medición Real', 'Color', 'white');
+figure('Name', 'Comparación del Modelo sin Retraso vs Medición Real', 'Color', 'white');
 
 % Gráfico superior: Las tres señales juntas en el tramo completo (o en validación)
 subplot(2,1,1);
