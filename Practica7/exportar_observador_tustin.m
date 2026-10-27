@@ -2,9 +2,12 @@ function exportar_observador_tustin
 % Tustin del observador continuo en estados fisicos [theta; omega].
 % G: grados/us. Arduino: rad y rad/s. Retardo externo: dos muestras.
 carpeta = fileparts(mfilename('fullpath'));
-S = load(fullfile(carpeta, 'modelo_estimado.mat'), 'G');
-assert(S.G.Ts == 0, 'Se requiere G continuo.');
-[num, den] = tfdata(S.G, 'v');
+% Modelo corregido del TP2 (Codigos Matlab/disenar_control.m y su informe).
+% Entrada: variacion del pulso [us]. Salida: variacion del angulo [grados].
+% No usar modelo_estimado.mat: corresponde a la identificacion anterior.
+G = tf(36.82, [1 50.12 967.5]);
+% El retardo se aplica en Arduino; no esta incluido en esta transferencia.
+[num, den] = tfdata(G, 'v');
 num = num/den(1); den = den/den(1);
 assert(numel(den)==3 && all(num(1:end-1)==0), ...
     'Se requiere segundo orden y numerador constante.');

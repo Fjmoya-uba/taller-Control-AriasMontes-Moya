@@ -1,7 +1,7 @@
 %% Cargar el modelo estimado previamente
 clear; clc; close all;
 
-% Carga el archivo .mat que generó el script de estimación
+%% Carga el archivo .mat que generó el script de estimación
 load('modelo_estimado.mat'); 
 
 % Período de muestreo

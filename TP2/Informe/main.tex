@@ -11,8 +11,6 @@
     \usepackage{amsmath}
     \usepackage{xcolor}
 
-
-
     % Definición del tamaño de página y los márgenes:
     % Si preferís menos márgenes, descomentá la línea siguiente
     %\usepackage[a4paper,headheight=16pt,scale={0.7,0.8},hoffset=0.5cm]{geometry}
@@ -20,7 +18,7 @@
     \usepackage{caption}
     \usepackage{subcaption}
     \usepackage[utf8x]{inputenc}
-    \usepackage[spanish]{babel}  
+    \usepackage[spanish]{babel}
     \usepackage[per-mode=fraction]{siunitx}
     \sisetup
     {
@@ -77,8 +75,6 @@
     % ==== Paquetes para TikZ ====
     \usepackage{tikz}
     \usetikzlibrary{arrows.meta, positioning, shapes, calc}
-
-
 
     \usepackage{enumerate}
     \usepackage{booktabs}
@@ -187,6 +183,8 @@
 
     % INICIO DEL DOCUMENTO
 
+    \raggedbottom
+
     \begin{document}
 
     \begin{titlepage}
@@ -251,7 +249,7 @@
 
     Se define la salida del sistema como la posición longitudinal del carrito, $y=p$, expresada en centímetros. Se fija $p=0$ tomando la posición en la que el centro del carrito se encuentra alineado con la línea transversal correspondiente a la unión de las dos piezas de la barra (ver fig. \ref{fig:cero-carrito}), próxima a su centro. El sentido positivo corresponde al alejamiento respecto del sensor ultrasónico.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         \includegraphics[width=0.5\textwidth]{imagenes/cero-carrito.jpeg}
         \caption{Posición $0 \text{cm}$ para el carrito.}
@@ -266,7 +264,7 @@
 
     Para contrastar las lecturas se midió con regla la distancia $L$ desde el sensor hasta la cara más alejada del carrito. Por lo tanto, la distancia geométrica comparable con $d$ es $L-l_c$. En la referencia se obtuvo $L_0=21.7\,\text{cm}$, de modo que el desplazamiento independiente medido con regla es $p_{\text{regla}}=L-L_0$. La Tabla~\ref{tab:medicion_carrito} presenta los datos en el orden registrado. Las diferencias absolutas entre $d$ y $L-l_c$ pueden incluir diferencias en el origen físico de medición, así como errores propios a la hora de tomar las mediciones; no se aplicó una corrección adicional a los datos.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comparación de la posición del carrito obtenida con el sensor y con regla. Todas las distancias se expresan en centímetros.}
         \label{tab:medicion_carrito}
@@ -309,7 +307,7 @@
 
     La Tabla~\ref{tab:valores_sistema} presenta los resultados del ensayo. En los extremos operativos se midieron $\theta_b=-16.71\degree$ para $1100\,\mu\text{s}$ y $\theta_b=17.87\degree$ para $2000\,\mu\text{s}$. Se adoptan estos valores como límites observados de inclinación en operación, $\theta_b\in[-16.71\degree; 17.87\degree]$. La restricción implementada consiste en saturar el comando del servo a $u\in[1100,2000]\,\mu\text{s}$. Los límites angulares corresponden a las mediciones realizadas en los extremos de comando para el montaje ensayado. No representan una medición de todos los topes mecánicos ni garantizan por sí solos la validez del modelo lineal en todo el intervalo.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comandos aplicados, coordenadas nominales del servo e inclinación medida de la barra.}
         \label{tab:valores_sistema}
@@ -339,7 +337,7 @@
 
     A modo de resúmen se presentan en la Tabla \ref{tab:valores_lim} los rangos considerados para las variables en cuestión:
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \begingroup
         \small
@@ -358,7 +356,7 @@
     \end{table}
 
     En la fig.~\ref{fig:sist_de_ref} se incluye un esquema con las variables y sus sentidos de referencia:
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         \includegraphics[width=0.75\textwidth]{imagenes/ball_and_beam_servo.png}
         \caption{Sistema de referencia de la planta}
@@ -384,38 +382,37 @@
 
     Se propuso la siguiente ecuación en diferencias
     \begin{equation}
-        \widetilde\theta_b[k]=a_1\widetilde\theta_b[k-1]
-        +a_2\widetilde\theta_b[k-2]+b\widetilde u[k-2],
+        \widetilde\theta_b[k] = a_1\widetilde\theta_b[k-1]
+        + a_2\widetilde\theta_b[k-2] + b\widetilde u[k],
         \label{eq:regresion_servo}
     \end{equation}
-    y se estimaron los tres coeficientes mediante mínimos cuadrados. La entrada aparece desplazada dos muestras, equivalentes a $0.04\,\text{s}$, visto que el servo no responde en seguida a un cambio en la entrada. El resultado fue
+    y se estimaron los tres coeficientes mediante mínimos cuadrados. El resultado fue
     \begin{equation}
         G_{sb,d}(z)=\frac{\widetilde\Theta_b(z)}{\widetilde U(z)}
-        =\frac{0.01504}{z^2-0.7667z+0.1618}
-        =\frac{0.01504z^{-2}}{1-0.7667z^{-1}+0.1618z^{-2}}.
+        =\frac{5,721 \ 10^{-3}}{z^2-1.321z+0.472}
         \label{eq:servo_discreto_identificado}
     \end{equation}
 
     \subsubsection{Representación continua de segundo orden}
     A partir de los polos discretos $z_i$ se calcularon los parámetros $p_i=-\log(z_i)/T_s$ (usando un mapeo exponencial de los polos), de modo que los polos continuos son $-p_i$. Se conservó además la ganancia estática $K=G_{sb,d}(1)$, obteniéndose
     \[
-        K=0.038054815\,\frac{\degree}{\mu\text{s}},\qquad
-        p_{1,2}=45.537277\pm j\,15.381455\,\text{s}^{-1}.
+        K=0,0379\,\frac{\degree}{\mu\text{s}},\qquad
+        p_{1,2}=18,7714 \pm j\,13,9467\,\text{s}^{-1}.
     \]
     La representación continua construida con estos polos y esta ganancia es
     \begin{equation}
         G_{sb,c}(s)=\frac{Kp_1p_2}{(s+p_1)(s+p_2)}
-        =\frac{87.92}{s^2+91.07s+2310}.
+        =\frac{20,71}{s^2+37,54s+546,9}.
         \label{eq:servo_continuo_identificado}
     \end{equation}
-    Los dos polos son estables. Esta conversión conserva los polos y la ganancia estática, pero no garantiza una equivalencia exacta de las respuestas temporales discreta y continua. 
+    Los dos polos son estables. Esta conversión conserva los polos y la ganancia estática, pero no garantiza una equivalencia exacta de las respuestas temporales discreta y continua.
 
     \subsubsection{Validación con datos reservados}
     Se simuló el modelo discreto en forma libre con la entrada registrada, sin reemplazar recursivamente su salida por las mediciones. La simulación comenzó al inicio del registro recortado, con condiciones iniciales nulas en las variables centradas, y continuó hasta el tramo de validación para conservar la historia de entrada. Finalmente se restituyó la media angular de entrenamiento.
 
     Sobre las últimas 693 muestras, no utilizadas en la regresión, se obtuvo
     \[
-        \mathrm{RMSE}=0.453553\degree,\qquad \mathrm{FIT}=91.28\,\%.
+        \mathrm{RMSE}=0.649678\degree,\qquad \mathrm{FIT}=87.71\,\%.
     \]
     Las métricas se calcularon como
     \[
@@ -428,39 +425,49 @@
     donde $\mathcal V$ es el conjunto de muestras de validación y $N_v=693$. El resultado respalda el uso del modelo discreto para representar la dinámica comando--ángulo bajo las condiciones del ensayo. Estas métricas corresponden exclusivamente a $G_{sb,d}(z)$; no se atribuyen al modelo continuo ni a la planta completa con el carrito.
 
     Por otro lado, en la fig. \ref{fig:validacion_servo_barra} se graficó también la respuesta a la entrada de la planta contínua estimada con la respuesta real de la planta.
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
-        \includegraphics[width=0.8\textwidth]{imagenes/tf_servo_barra_real_vs_modelo_sin_retraso.eps}
+        \includegraphics[width=0.8\textwidth]{imagenes/salida_real_vs_simulada_servo_barra.eps}
         \caption{Comparación experimental del modelo identificado del conjunto servomotor--barra}
         \label{fig:validacion_servo_barra}
     \end{figure}
 
     Se puede observar que la planta estimada representa a la planta real con gran exactitud.
+
     \subsubsection{Comparación del subsistema con retardo adicional}
-    Se comparó la representación continua con dos alternativas que conservan exactamente sus polos y ganancia y agregan únicamente un retardo fijo:
+    Se comparó la representación sin retardo contra la representación considerando un retardo de una muestra. Para ello se consideró la siguiente ecuación en diferencias, y se volvió a efectuar la regresión:
+
+    \begin{equation}
+        \widetilde\theta_b[k] = a_1\widetilde\theta_b[k-1]
+        + a_2\widetilde\theta_b[k-2] + b\widetilde u[k-1],
+        \label{eq:regresion_servo}
+    \end{equation}
+
+    Se emplearon la misma entrada registrada y el mismo tramo de validación del último 25\,\% de las muestras. De la regresión se obtuvo la siguiente transferencia:
+
+    \begin{equation}
+        \widetilde{G}_{sb,c}(s)=\frac{\tilde{K}\tilde{p_1}\tilde{p_2}}{(s+\tilde{p_1})(s+\tilde{p_2})}
+        =\frac{36,82}{s^2+50,12s+967,5}.
+        \label{eq:servo_barra_con_delay}
+    \end{equation}
+
+    Cuyos parámetros son:
+
     \[
-        G_{sb,c,T_d}(s)=G_{sb,c}(s)e^{-T_ds},
-        \qquad T_d\in\{0.02,0.04\}\,\text{s}.
+        K=0,0381\,\frac{\degree}{\mu\text{s}},\qquad
+        p_{1,2} = 25,0609 \pm j\,18,4242\,\text{s}^{-1}.
     \]
-    Se emplearon la misma entrada registrada y el mismo tramo de validación del último 25\,\% de las muestras. La Tabla~\ref{tab:validacion_servo_retardo} resume los resultados.
 
-    \begin{table}[H]
+    Para comparar ambas respuestas, se simuló la respuesta de ambos modelos ante el mismo tren de excitaciones y se los comparó contra la salida real medida. Dicho gráfico se puede ver en la figura \ref{fig:comparacion_con_sin_delay}.
+
+    \begin{figure}[!htbp]
         \centering
-        \caption{Validación del conjunto servomotor--barra con y sin retardo adicional.}
-        \label{tab:validacion_servo_retardo}
-        \begin{tabular}{lrr}
-            \toprule
-            Modelo & RMSE [$\degree$] & FIT [\%] \\
-            \midrule
-            Discreto $G_{sb,d}(z)$ & 0.453553 & 91.28 \\
-            Continuo $G_{sb,c}(s)$ & 0.423600 & 91.85 \\
-            Continuo con $T_d=0.02\,\text{s}$ & 0.598778 & 88.48 \\
-            Continuo con $T_d=0.04\,\text{s}$ & 1.111370 & 78.63 \\
-            \bottomrule
-        \end{tabular}
-    \end{table}
+        \includegraphics[width=0.8\textwidth]{imagenes/comparacion_servo_barra_con_sin_delay.eps}
+        \caption{Comparación de respuestas de los modelos con y sin retardo}
+        \label{fig:comparacion_con_sin_delay}
+    \end{figure}
 
-    El modelo continuo sin retardo adicional presentó el menor RMSE y el mayor FIT. Agregar $20\,\text{ms}$ o $40\,\text{ms}$ deterioró la concordancia con las mediciones. Por lo tanto, se selecciona la Ecuación~\eqref{eq:servo_continuo_identificado}, sin retardo adicional, como modelo continuo de trabajo del conjunto servomotor--barra. 
+    Al comparar los dos modelos se observa que la respuesta del modelo con retardo de una muestra se ajusta mejor a la respuesta real que la que no posee retardo, por lo que se utilizará el modelo con retardo de aquí en más para representar la dinámica servomotor-barra. La acción de control mostrada en el gráfico fue ajustada a la escala de las respuestas centrándola alrededor del origen y aplicándole un escalamiento para poder visualizar todo el conjunto correctamente.
 
     \subsubsection{Alcance del modelo seleccionado}
     La identificación experimental permitió representar la dinámica efectiva del conjunto sin medir por separado inercias, parámetros eléctricos y geometría del mecanismo. Su limitación es que la validez depende de las condiciones y de la excitación del ensayo; un buen ajuste comando--ángulo no demuestra por sí solo que el modelo del carrito o su conexión en cascada sean adecuados.
@@ -471,7 +478,7 @@
     Se registraron solamente el ángulo de la barra estimado con el filtro complementario y la distancia ultrasónica, a $50\,\text{Hz}$. Para identificar el carrito se utilizó como entrada el ángulo medido, en grados, y como salida $y=d-15.612\,\text{cm} = d + \frac{l_c}{2} - d_0 - \frac{l_c}{2} = x_p - p_0$. Por lo tanto, los pulsos del servo constituyen la excitación del ensayo, pero no se los supone iguales a escalones ideales de inclinación.
 
     \subsubsection{Estructura y procedimiento de ajuste}
-    
+
 
     Para modelar la dinámica del carrito se planteó la 2° Ley de Newton sobre el eje de la barra, de manera que:
     \begin{equation}
@@ -504,7 +511,7 @@
         \item \textbf{Elegir y comprobar el modelo.} Se conserva el valor de $a_c$ con menor error y se afina la búsqueda a su alrededor cuando corresponde. Con los parámetros elegidos se continúa la simulación sobre las 398 muestras reservadas, sin volver a ajustar el modelo ni reiniciar su posición o velocidad.
     \end{enumerate}
 
- Se obtuvieron los siguientes parámetros:
+    Se obtuvieron los siguientes parámetros:
     \[
         K_c=24.428153\,\frac{\text{cm}}{\degree\,\text{s}^2},\qquad
         a_c=6.815007\,\text{s}^{-1},\qquad
@@ -531,97 +538,78 @@
     \end{tabular}
     \end{center}
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
-        \includegraphics[width=1\textwidth]{imagenes/identificacion-del-carrito.png}
+        \includegraphics[width=1\textwidth]{imagenes/identificacion-del-carrito.eps}
         \caption{Comparación entre la posición medida del carrito y la estimada por el modelo a partir del ángulo registrado. Ambas posiciones utilizan la referencia $y=d-15.612\,\text{cm}$.}
         \label{fig:carrito_posicion_medida_estimada}
     \end{figure}
 
     El modelo con rozamiento viscoso obtuvo menor RMSE y mayor FIT que el doble integrador en este tramo de validación. Su FIT de $76.13\,\%$ indica una mejor predicción que la referencia constante igual a la media del tramo. En cambio, el FIT de $-32.05\,\%$ del doble integrador indica un error mayor que el de esa referencia. Por lo tanto, los resultados respaldan la incorporación del polo viscoso entre las dos estructuras evaluadas.
 
-    Se cree que el error puede deberse, en parte, a que el rozamiento real no es solamente proporcional a la velocidad: pueden intervenir fricción estática, cambios de sentido y pequeñas irregularidades del montaje. También pueden contribuir el ruido de los sensores y los errores en el ángulo utilizado como entrada. Además, la simulación no corrige su posición con las mediciones: pequeñas diferencias de aceleración pueden acumularse y producir diferencias importantes de posición. 
+    Se cree que el error puede deberse, en parte, a que el rozamiento real no es solamente proporcional a la velocidad: pueden intervenir fricción estática, cambios de sentido y pequeñas irregularidades del montaje. También pueden contribuir el ruido de los sensores y los errores en el ángulo utilizado como entrada. Además, la simulación no corrige su posición con las mediciones: pequeñas diferencias de aceleración pueden acumularse y producir diferencias importantes de posición.
 
-    Se adoptó el modelo con rozamiento viscoso como punto de partida para el diseño porque representa una resistencia al movimiento y obtuvo el mejor resultado de validación. Estas métricas corresponden al modelo del carrito excitado por el ángulo medido, incluyendo el término $c$ y las condiciones iniciales fijas. No validan por sí solas la planta completa servo--barra--carrito ni aseguran el mismo ajuste en otros ensayos.
+    Se adoptó el modelo con rozamiento viscoso como punto de partida para el diseño porque representa una resistencia al movimiento y obtuvo el mejor resultado de validación. Estas métricas corresponden al modelo del carrito excitado por el ángulo medido, incluyendo el término $c$ y las condiciones iniciales fijas.
 
     Al controlar con realimentación, se mide continuamente la posición y se actúa para reducir su diferencia con la referencia. Esto permite tolerar ciertos errores del modelo y ayuda a explicar por qué un ajuste imperfecto puede servir para el diseño.
 
-    La estabilidad observada no implica que las respuestas reales coincidan exactamente con las simuladas. Pueden existir diferencias en las oscilaciones, el sobrepico, el tiempo de establecimiento o el error final. Estas diferencias se analizarán en la sección de diseño y evaluación de los controladores, comparando las respuestas simuladas con las experimentales.
-   
+    La estabilidad observada no implica que las respuestas reales coincidan exactamente con las simuladas. Pueden existir diferencias en las oscilaciones, el sobrepico, el tiempo de establecimiento o el error final.
+
      \subsection{Modelo de la planta completa}
         \subsubsection{Transferencia entrada--salida}
     La planta completa reúne los dos modelos obtenidos: el servo convierte el comando en una inclinación de la barra y esa inclinación produce el movimiento del carrito. Como la salida del primer modelo es la entrada del segundo, sus transferencias se multiplican:
     \[
         G_P(s)=G_s(s)G_c(s),\qquad
-        G_s(s)=\frac{87.92}{s^2+91.07s+2310},\qquad
-        G_c(s)=\frac{19.619739}{s(s+5.7317425)}.
+        G_s(s)=\frac{36,82}{s^2+50,12s+967,5},\qquad
+        G_c(s)=\frac{24.428153}{s(s+6.815007)}.
     \]
     La entrada es la variación del comando del servo respecto de la horizontal, $\Delta u=u-u_0$, en microsegundos, con $u_0=1544\,\mu\text{s}$. La salida es la variación de posición del carrito respecto de una referencia fija, expresada en centímetros. Con los últimos parámetros del carrito y los coeficientes redondeados del servo, el modelo de trabajo resulta:
     \begin{equation}
         G_P(s)=\frac{\Delta Y(s)}{\Delta U(s)}
-        =\frac{87.92\cdot19.619739}
-        {(s^2+91.07s+2310)\,s(s+5.7317425)}.
+        =\frac{36,82\cdot24.428153}
+        {(s^2+50,12s+967,5)\,s(s+6.815007)}.
         \label{eq:planta_completa}
     \end{equation}
     El ángulo intermedio se expresa en grados en ambos modelos: no corresponde aplicar nuevamente un factor de conversión de grados a radianes ni multiplicar por la gravedad. La planta tiene un polo en el origen y tres polos con parte real negativa; no es asintóticamente estable en lazo abierto.
 
-    Esta transferencia representa solamente la parte lineal del modelo. El término constante $c=-3.2630965\,\text{cm/s}^2$ se utilizó para ajustar y validar el movimiento registrado, pero no forma parte de la transferencia comando--posición. Por eso, para reproducir aquel ensayo en una simulación, se debe agregar ese término a la ecuación de aceleración del carrito y utilizar $y(0)=0.2995\,\text{cm}$ y $\dot y(0)=0$. La transferencia por sí sola, con condiciones iniciales nulas, no reproduce la misma simulación utilizada para calcular el RMSE y el FIT.
+    Esta transferencia representa solamente la parte lineal del modelo. El término constante $c=-0.56921535\,\frac{\text{cm}}{\text{s}^2}$ se utilizó para ajustar y validar el movimiento registrado, pero no forma parte de la transferencia comando--posición. Por eso, para reproducir aquel ensayo en una simulación, se debe agregar ese término a la ecuación de aceleración del carrito y utilizar $y(0)=15.9115-15.612=0.2995\,\text{cm}$ y $v(0)=0\,\text{cm/s}$. La transferencia por sí sola, con condiciones iniciales nulas, no reproduce la misma simulación utilizada para calcular el RMSE y el FIT.
 
     \subsubsection{Representación en variables de estado}
     Una realización de la parte lineal sin retardo se obtiene con
-    $x=[\delta y\;\delta\dot y\;\delta\theta_b\;\delta\dot\theta_b]^\mathsf{T}$:
+    $x=[\delta y\;\delta\dot y\;\delta\theta_b\;\delta\dot\theta_b]^\mathsf{T} = [x_1 \ x_2 \ x_3 \ x_4]^\mathsf{T}$:
     \begin{equation}
         \dot x=Ax+B\delta u,\qquad \delta y=Cx+D\delta u,
     \end{equation}
     \[
         A=\begin{bmatrix}
             0&1&0&0\\
-            0&-5.7317425&19.619739&0\\
+            0&-6.815007&24,428&0\\
             0&0&0&1\\
-            0&0&-2310&-91.07
+            0&0&-1&-50,12
         \end{bmatrix},\quad
-        B=\begin{bmatrix}0\\0\\0\\87.92\end{bmatrix},\quad
+        B=\begin{bmatrix}0\\0\\0\\36,82\end{bmatrix},\quad
         C=\begin{bmatrix}1&0&0&0\end{bmatrix},\quad D=0.
         \label{eq:estados_planta}
     \]
 
     Las unidades de los estados son, respectivamente, cm, cm/s, grados y grados/s. La segunda fila de $A$ describe el movimiento del carrito con los nuevos valores de $a_c$ y $K_c$; la cuarta fila y $B$ describen la respuesta del servo. Esta representación omite el término constante $c$, al igual que la transferencia anterior. Si se conserva el sesgo en las coordenadas originales, debe agregarse a la ecuación de estados el vector $[0\;c\;0\;0]^\mathsf{T}$.
 
-    El modelo lineal se adopta como aproximación de trabajo próxima a la horizontal. El sesgo ajustado implica que la horizontal no es un equilibrio exacto del modelo que incluye $c$: para reposo, ese modelo exige $\theta_{b,e}=-c/K_c\simeq0.1663\degree$. Este valor es una consecuencia del ajuste, no una nueva calibración de la horizontal. La referencia de posición utilizada es la definida experimentalmente y no una medición del centro geométrico exacto.
+    El modelo lineal se adopta como aproximación de trabajo próxima a la horizontal. El sesgo ajustado implica que la horizontal no es un equilibrio exacto del modelo que incluye $c$: para reposo, ese modelo exige $\theta_{b,e}=-c/K_c \simeq 0,0233\degree$. Este valor es una consecuencia del ajuste, no una nueva calibración de la horizontal. La referencia de posición utilizada es la definida experimentalmente y no una medición del centro geométrico exacto.
 
-    \subsubsection{Alternativa con retardo fijo}
-    La alternativa exigida para el servo conserva sus polos y ganancia y agrega solamente un retardo. En la planta completa resulta
-    \[
-        G_{P,T_d}(s)=G_P(s)e^{-T_ds}.
-    \]
-    La comparación se realizó con el script \texttt{TP2/comparar\_retardo\_planta.m} y el registro \texttt{mediciones\_dinamica\_carrito\_2.mat}, que incluye el comando aplicado al servo, el ángulo medido y la distancia del carrito. Se utilizaron las primeras 1733 muestras, entre $0$ y $34.640\,\text{s}$. Se simularon las opciones sin retardo y con retardos fijos de $20$ y $40\,\text{ms}$, manteniendo los mismos parámetros, el término $c$ y las mismas condiciones iniciales. El servo se inició con el ángulo de la primera medición y velocidad angular nula; antes del registro se supuso comando horizontal. Los retardos se implementaron desplazando el comando una o dos muestras, respectivamente, sin utilizar Padé.
+    \subsubsection{Comparación de la respuesta de la planta completa con y sin retardo}
+    Para completar el análisis se comparó la respuesta de la planta completa considerando los casos en que la transferencia servomotor-barra posee retardo y en el que no, comparando ambas respuestas con la respuesta medida.
 
-    Las métricas de posición se calcularon sobre las últimas 434 muestras, sin reajustar los modelos:
-    \begin{center}
-    \begin{tabular}{rrr}
-        \toprule
-        Retardo [ms] & RMSE [cm] & FIT [\%] \\
-        \midrule
-        0  & 16.67868 & -713.04 \\
-        20 & 16.65136 & -711.71 \\
-        40 & 16.62408 & -710.38 \\
-        \bottomrule
-    \end{tabular}
-    \end{center}
-
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/comparacion-de-retardo.png}
-        \caption{Respuesta medida y simulada de la planta completa para retardos de 0, 20 y 40 ms, con los mismos parámetros y condiciones iniciales.}
+        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_planta_completa.eps}
+        \caption{Comparativa de respuestas}
         \label{fig:comparacion_retardo_planta}
     \end{figure}
 
-    Las curvas simuladas reproducen parte de las subidas y bajadas observadas, pero presentan una separación de posición que aumenta durante el ensayo. No se trata solamente de un desplazamiento constante que pueda corregirse moviendo la curva: existe una deriva acumulada. Una posible explicación es que pequeñas diferencias entre el ángulo medido y el calculado por el modelo del servo se acumulan al obtener la posición. En el modelo del carrito, una diferencia angular constante $\Delta\theta$ produce, después del transitorio, una diferencia de velocidad $\Delta v=(K_c/a_c)\Delta\theta\simeq3.42\Delta\theta$, con el ángulo en grados y la velocidad en cm/s. Por eso, diferencias angulares pequeñas pueden generar varios centímetros de error durante el registro.
+    En el gráfico resultante de la figura \ref{fig:comparacion_retardo_planta} se observa que ambas respuestas son consistentes con las excitaciones que les fueron aplicadas a ambos modelos, donde ambas respuestas siguen la curva de la acción de control razonablemente en el tiempo, cada una con un retardo distinto. Sin embargo, al comparar contra la medición real se observa una fuerte discrepancia entre las respuestas modeladas y la medición. Esta diferencia se atribuye a errores a la hora de obtener las mediciones, ya que la curva medida no se condice con los impulsos aplicados, incluso viendo ambas curvas en una misma escala temporal.
 
-    También pueden contribuir efectos de rozamiento no representados y el hecho de que $c$ se ajustó utilizando el ángulo medido, mientras que aquí se utiliza el ángulo simulado por el servo. Estas explicaciones son hipótesis compatibles con los resultados, no causas identificadas por separado. Se conservaron las predicciones originales, sin desplazar ni quitar tendencias a las curvas para mejorar las métricas. Además, se utilizó la misma corrida que para identificar el carrito.
-
-    El retardo de $40\,\text{ms}$ obtuvo el menor RMSE, pero la reducción respecto de la opción sin retardo fue de apenas $0.05460\,\text{cm}$, aproximadamente un $0.33\,\%$. La mejora es pequeña frente al error total y no corrige la deriva. Por este motivo se eligió continuar con la planta sin retardo adicional como modelo nominal de trabajo, por su simplicidad y porque el retardo tampoco mejoró la comparación previa comando--ángulo. Esta elección no implica que la planta completa haya quedado validada con precisión: se adopta como punto de partida para el diseño y su utilidad se evaluará mediante las respuestas de los controladores.
+    Las curvas fueron normalizadas en media (junto con un escalamiento adicional en la curva de la acción de control) para poder visualizarlas adecuadamente.
 
     \subsubsection{Ventajas y limitaciones del modelado experimental}
     La identificación por subsistemas permite obtener una representación sencilla sin medir masas, inercias ni geometría detallada, y separar la respuesta del actuador de la del carrito. A cambio, los parámetros dependen del montaje, del rango de excitación, de la calibración y de los sensores utilizados. El modelo lineal no representa explícitamente fricción estática o de Coulomb, holguras, saturaciones ni fallos de eco. Su uso se limita a movimientos próximos a las condiciones ensayadas y debe contrastarse con nuevos ensayos antes de generalizar sus predicciones.
@@ -635,28 +623,28 @@
     márgenes adecuados de estabilidad.
 
     La frecuencia de muestreo y control es de $50\,\text{Hz}$, correspondiente a un período de $20\,\text{ms}$. La frecuencia de Nyquist es de $25\,\text{Hz}$, pero el ancho de banda del lazo debe mantenerse bastante por debajo de este valor para reducir los efectos del muestreo y los retardos. Al comparar frecuencias debe distinguirse entre $f$, expresada en Hz, y $\omega=2\pi f$, expresada en rad/s.
-    
+
     La acción de control debe respetar los límites del servo: $u\in[1100;2000]\,\mu\text{s}$. Respecto del comando de horizontalidad $u_0=1544\,\mu\text{s}$, esto corresponde a $\Delta u\in[-444;456]\,\mu\text{s}$. También debe evitarse que el carrito alcance los extremos del recorrido. La saturación puede hacer que la respuesta real difiera de la simulación lineal y, en los controladores PI y PID, provocar acumulación de la acción integral.
-    
+
     Finalmente, existe un compromiso entre rapidez de respuesta, esfuerzo de control y robustez. Buscar una respuesta más rápida puede exigir comandos mayores y aumentar la sensibilidad al ruido y a las dinámicas no representadas. Por eso, cada diseño debe verificarse mediante sus márgenes de estabilidad, la acción de control y la respuesta temporal. Dado el error observado en la validación de la planta completa, las prestaciones simuladas se consideran aproximadas y deben contrastarse con los ensayos.
 
     \section{Diseño de controladores}
 
     \subsection{Análisis de los márgenes de la planta}
-    Antes de diseñar los controladores se analizó el diagrama de Bode de la planta nominal $G_P(s)$ dada en la ecuación~\ref{eq:planta_completa}, sin retardo adicional. Para realimentación negativa unitaria y ganancia de controlador igual a uno, se obtuvo un margen de fase de $88.4\degree$ a la frecuencia de cruce de ganancia $\omega_{gc}=0.13\,\text{rad/s}$. El margen de ganancia fue de $46.6\,\text{dB}$, a la frecuencia de cruce de fase $\omega_{pc}=11.7\,\text{rad/s}$ (fig. \ref{fig:bode_planta}).
+    Antes de diseñar los controladores se analizó el diagrama de Bode de la planta nominal $G_P(s)$ dada en la ecuación~\ref{eq:planta_completa}, sin retardo adicional. Para realimentación negativa unitaria y ganancia de controlador igual a uno, se obtuvo un margen de fase de $88.4\degree$ a la frecuencia de cruce de ganancia $\omega_{gc}=0.136\,\text{rad/s}$. El margen de ganancia fue de $47.3\,\text{dB}$, a la frecuencia de cruce de fase $\omega_{pc}=10.8\,\text{rad/s}$ (fig. \ref{fig:bode_planta}).
 
     El margen de retardo obtenido fue de $11.4\,\text{s}$: representa el retardo puro adicional que llevaría al lazo al límite de estabilidad, manteniendo la ganancia considerada. Estos resultados muestran márgenes amplios, aunque con una frecuencia de cruce de ganancia baja, lo que motiva aumentar la ganancia para obtener una respuesta más rápida.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/bode-planta-total.png}
+        \includegraphics[width=1\textwidth]{imagenes/bode-planta-total.eps}
         \caption{Diagrama de Bode de la planta nominal $G_P(s)$ y márgenes para realimentación negativa unitaria con ganancia de controlador igual a uno.}
         \label{fig:bode_planta}
     \end{figure}
 
     \subsection{Control proporcional}
-    Para el controlador proporcional se adoptó $C_P(s)=K_p$. Como una ganancia positiva constante no modifica la fase, se buscó en el Bode de la planta la frecuencia para la cual la fase fuera aproximadamente $-120\degree$, correspondiente a un margen de fase deseado de $60\degree$. Esta condición se encontró alrededor de $\omega=2.54\,\text{rad/s}$.
+    Para el controlador proporcional se adoptó $C_P(s)=K_p$. Como una ganancia positiva constante no modifica la fase, se buscó en el Bode de la planta la frecuencia para la cual la fase fuera aproximadamente $-120\degree$, correspondiente a un margen de fase deseado de $60\degree$. Esta condición se encontró alrededor de $\omega=2.5\,\text{rad/s}$.
 
     Para desplazar el cruce de ganancia hacia esa región se eligió una ganancia de $26\,\text{dB}$, calculada en MATLAB mediante \texttt{db2mag(26)}:
     \begin{equation}
@@ -666,12 +654,12 @@
     \end{equation}
     Las unidades corresponden a la entrada incremental del servo en microsegundos y al error de posición en centímetros utilizados en el modelo.
 
-    Al evaluar el lazo abierto compensado $L_P(s)=K_pG_P(s)$, se obtuvo una frecuencia de cruce de ganancia de $2.39\,\text{rad/s}$, con un margen de fase de $61.9\degree$ y un margen de ganancia de $20.6\,\text{dB}$. La ganancia elegida aproxima el objetivo de diseño y conserva un margen de fase ligeramente superior a $60\degree$. Frente al caso de ganancia unitaria, aumenta la frecuencia de cruce a costa de reducir los márgenes de estabilidad.
+    Al evaluar el lazo abierto compensado $L_P(s)=K_pG_P(s)$, se obtuvo una frecuencia de cruce de ganancia de $2.54\,\text{rad/s}$, con un margen de fase de $62\degree$ y un margen de ganancia de $17.7\,\text{dB}$. La ganancia elegida aproxima el objetivo de diseño y conserva un margen de fase ligeramente superior a $60\degree$. Frente al caso de ganancia unitaria, aumenta la frecuencia de cruce a costa de reducir los márgenes de estabilidad.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/bode_con_P.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/bode_con_P.eps}
         \caption{Diagrama de Bode del lazo abierto con control proporcional: $\omega_{gc}=2.39\,\text{rad/s}$, margen de fase de $61.9\degree$ y margen de ganancia de $20.6\,\text{dB}$.}
         \label{fig:bode_control_proporcional}
     \end{figure}
@@ -681,7 +669,7 @@
     \[
         T_P(s)=\frac{K_pG_P(s)}{1+K_pG_P(s)}.
     \]
-    Para un escalón de referencia de $0.1\,\text{m}=10\,\text{cm}$, el modelo continuo lineal presentó un tiempo de establecimiento al $2\,\%$ de $1.6116\,\text{s}$, un tiempo de subida del $10$ al $90\,\%$ de $0.5295\,\text{s}$ y un tiempo al pico de $1.1295\,\text{s}$. El sobrepaso fue de $6.25\,\%$, equivalente a una posición máxima de $10.625\,\text{cm}$. El valor pico $1.0625$ informado por \texttt{stepinfo(T)} corresponde a un escalón unitario; al multiplicar la referencia por diez, se escala la amplitud de la respuesta, mientras que estos tiempos y el sobrepaso porcentual se mantienen para el modelo lineal.
+    Para un escalón de referencia de $0.1\,\text{m}=10\,\text{cm}$, el modelo continuo lineal presentó un tiempo de establecimiento de $1.4712\,\text{s}$, un tiempo de subida del $10$ al $90\,\%$ (\textit{rise time}) de $0.4839\,\text{s}$ y un tiempo al pico de $1.0555\,\text{s}$. El \textit{overshoot} fue de $5.86\,\%$, equivalente a una posición máxima de $10.625\,\text{cm}$. El valor pico $1.0585$ informado por \texttt{stepinfo(T)} corresponde a un escalón unitario; al multiplicar la referencia por diez, se escala la amplitud de la respuesta, mientras que estos tiempos y el sobrepaso porcentual se mantienen para el modelo lineal.
 
     \subsubsection{Discretización bilineal y ley de control}
     Se utilizó un período de muestreo $T_s=0.02\,\text{s}$, correspondiente a $50\,\text{Hz}$. Aplicando la transformación bilineal o de Tustin,
@@ -694,6 +682,7 @@
         \Delta u[k]=K_p e[k],\qquad e[k]=r[k]-y[k].
         \label{eq:p_discreto}
     \end{equation}
+
     Para implementar los controladores P, PI y PD en Arduino se utiliza una misma ecuación, que se evalúa cada $20\,\text{ms}$:
     \[
         \begin{aligned}
@@ -711,14 +700,14 @@
         \operatorname{sat}_{[1100,2000]}\left(1544+K_p e[k]\right)\right)
         \quad [\mu\text{s}],
     \]
-    con el error expresado en centímetros. Esta es la ley utilizada en la simulación de la implementación digital.
+    con el error expresado en centímetros.
 
-    Para simular la planta muestreada se utilizó una discretización con retenedor de orden cero (ZOH), que representa el comando constante entre actualizaciones del Arduino. La transformación bilineal se aplica al controlador. Se verificó en MATLAB que tanto el lazo continuo como el lazo digital lineal tienen sus polos en la región de estabilidad correspondiente. 
+    Para simular la planta muestreada se utilizó una discretización con retenedor de orden cero (ZOH), que representa el comando constante entre actualizaciones del Arduino. La transformación bilineal se aplica al controlador. Se verificó en MATLAB que tanto el lazo continuo como el lazo digital lineal tienen sus polos en la región de estabilidad correspondiente.
 
     \subsubsection{Simulación digital del escalón de posición}
-    Se simuló un escalón de $10\,\text{cm}$ aplicado en $t=2\,\text{s}$, partiendo del reposo y de posición cero. Se tomó el modelo nominal sin el sesgo de aceleración ($c=0$), incluyendo los límites y el redondeo del comando. Los resultados se resumen en la Tabla~\ref{tab:p_escalon_simulado}; el tiempo de establecimiento se mide desde la aplicación del escalón.
+    Se simuló un escalón de $10\,\text{cm}$ aplicado en $t=2\,\text{s}$, partiendo del reposo y de posición cero. Se tomó el modelo nominal sin el sesgo de aceleración ($c=0$), incluyendo los límites y el redondeo del comando. Los resultados se resumen en la Tabla~\ref{tab:p_escalon_simulado}. El tiempo de establecimiento se mide desde la aplicación del escalón.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Respuesta simulada al escalón de $10\,\text{cm}$ con control proporcional digital, límites y redondeo del comando.}
         \label{tab:p_escalon_simulado}
@@ -726,23 +715,23 @@
             \toprule
             Magnitud & Resultado \\
             \midrule
-            Tiempo de establecimiento al $2\,\%$ & $1.6190\,\text{s}$ \\
-            Sobrepaso máximo & $7.28\,\%$ \\
-            Error medio en los últimos $2\,\text{s}$ & $-0.00040\,\text{cm}$ \\
-            Pulso mínimo / máximo & $1529\,/\,1744\,\mu\text{s}$ \\
+            Tiempo de establecimiento al $2\,\%$ & $1.4784\,\text{s}$ \\
+            Sobrepaso máximo & $7.04\,\%$ \\
+            Error medio en los últimos $2\,\text{s}$ & $-0.00183\,\text{cm}$ \\
+            Pulso mínimo / máximo & $1530\,/\,1744\,\mu\text{s}$ \\
             Muestras con saturación & $0$ \\
             \bottomrule
         \end{tabular}
     \end{table}
 
-    El tiempo de establecimiento resulta cercano al continuo y el sobrepaso aumenta de $6.25\,\%$ a $7.28\,\%$. La comparación contempla conjuntamente el muestreo y el redondeo del comando. Durante este ensayo no se alcanzaron los límites del actuador.
+    El tiempo de establecimiento resulta cercano al continuo y el sobrepaso aumenta de $6.25\,\%$ a $7.04\,\%$. La comparación contempla conjuntamente el muestreo y el redondeo del comando. Durante este ensayo no se alcanzaron los límites del actuador.
 
-    El error estacionario del modelo digital lineal nominal fue numéricamente $-5.3291\times10^{-14}\,\text{cm}$, compatible con cero dentro de la precisión de cálculo. Esto es consistente con el polo en el origen de la planta: con realimentación unitaria estable, el modelo nominal con control P tiene error nulo ante una referencia escalón. El error medio de $-0.00040\,\text{cm}$ corresponde a una ventana final de la simulación con redondeo y no constituye una medición experimental. La fricción, un desajuste del equilibrio u otras perturbaciones pueden producir un error persistente en la planta real, por lo que este resultado deberá contrastarse con el ensayo.
+    El error estacionario del modelo digital lineal nominal fue numéricamente $-5.107\times10^{-14}\,\text{cm}$, compatible con cero dentro de la precisión de cálculo. Esto es consistente con el polo en el origen de la planta: con realimentación unitaria estable, el modelo nominal con control P tiene error nulo ante una referencia escalón. El error medio de $-0.00183\,\text{cm}$ corresponde a una ventana final de la simulación con redondeo y no constituye una medición experimental. La fricción, un desajuste del equilibrio u otras perturbaciones pueden producir un error persistente en la planta real, por lo que este resultado se constrastará con el ensayo.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/escalon_10cm_P.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/escalon_10cm_P.eps}
         \caption{Respuesta simulada con control P ante un escalón de posición de $10\,\text{cm}$: comparación del modelo continuo, el digital lineal y el digital con límites y redondeo. Se incluye el pulso aplicado al servo.}
         \label{fig:p_escalon_simulado}
     \end{figure}
@@ -750,12 +739,12 @@
     \subsubsection{Simulación de una perturbación impulsiva sobre el carrito}
     Para representar un ligero golpe se mantuvo la referencia en cero y se introdujo en $t=5\,\text{s}$ un salto de velocidad de $5.00\,\text{cm/s}$. Esta perturbación representa el efecto de un impulso mecánico sobre el carrito; no es un impulso en la referencia de posición. La amplitud elegida es ilustrativa, ya que no se dispone de una medición del impulso aplicado en el ensayo real.
 
-    Con el mismo controlador digital y $c=0$, el máximo desplazamiento absoluto posterior al golpe fue de $0.61569\,\text{cm}$. El pulso del servo permaneció entre $1532$ y $1545\,\mu\text{s}$, sin muestras saturadas. Estos resultados describen la recuperación simulada para el salto de velocidad elegido.
+    Con el mismo controlador digital y $c=0$, el máximo desplazamiento absoluto posterior al golpe fue de $0.54567\,\text{cm}$. El pulso del servo permaneció entre $1533$ y $1545\,\mu\text{s}$, sin muestras saturadas. Estos resultados describen la recuperación simulada para el salto de velocidad elegido.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/p_golpe_simulado.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/p_golpe_simulado.eps}
         \caption{Respuesta simulada con control P digital ante un salto de velocidad de $5\,\text{cm/s}$ en $t=5\,\text{s}$, con referencia de posición nula.}
         \label{fig:p_golpe_simulado}
     \end{figure}
@@ -763,9 +752,9 @@
     \subsubsection{Comparación experimental del escalón de posición}
     Se aplicó a la planta real un escalón de referencia de $0$ a $10\,\text{cm}$ con el controlador proporcional diseñado. El registro se guardó en \texttt{controlador\_proporcional.mat} y se procesó mediante \texttt{comparar\_escalon\_P.m}. La referencia y la distancia recibidas se convirtieron a posiciones relativas restando $15.612\,\text{cm}$. Para superponer las respuestas se tomó como $t=0$ el instante del cambio de referencia, registrado a los $5\,\text{s}$ del ensayo. No se aplicaron desplazamientos de posición para hacer coincidir las curvas.
 
-    La comparación se realizó con la simulación digital nominal, incluyendo el muestreo, los límites y el redondeo del comando, con $c=0$. La Tabla~\ref{tab:p_comparacion_escalon} resume los resultados posteriores al escalón. No se detectaron muestras inválidas. Los coeficientes utilizados en Arduino fueron $B_0=19.9526231$ y $A_1=A_2=B_1=B_2=0$. Se define el error como $e=r-y$ y se calcula su promedio sobre los últimos $2\,\text{s}$ de cada registro.
+    La comparación se realizó con la simulación digital nominal, incluyendo el muestreo, los límites y el redondeo del comando, con $c=0$. La Tabla~\ref{tab:p_comparacion_escalon} resume los resultados posteriores al escalón. Se define el error como $e=r-y$ y se calcula su promedio sobre los últimos $2\,\text{s}$ de cada registro.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comparación de la respuesta real y simulada al escalón de $10\,\text{cm}$ con control P.}
         \label{tab:p_comparacion_escalon}
@@ -782,27 +771,26 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[H]
+
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         % Imagen generada por el script: TP2/comparacion_escalon_P.png.
-        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_escalon_P.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_escalon_P.eps}
         \caption{Comparación de la respuesta real y simulada al escalón de $10\,\text{cm}$ con control proporcional. El origen temporal corresponde al cambio de referencia. Se muestran la posición del carrito y el comando del servo.}
         \label{fig:p_comparacion_escalon}
     \end{figure}
 
     La planta real presentó una oscilación considerablemente mayor que la simulada: alcanzó aproximadamente $17.6451\,\text{cm}$, frente a los $10\,\text{cm}$ de referencia. Luego del transitorio, la posición media en los últimos $2\,\text{s}$ fue de aproximadamente $11.2265\,\text{cm}$, mientras que la simulación convergió prácticamente a la referencia. El registro real no permaneció dentro de la banda de establecimiento de $10\pm0.2\,\text{cm}$ hasta el final del ensayo, por lo que no se obtuvo un tiempo de establecimiento con ese criterio en el intervalo posterior al escalón observado.
 
-    El RMSE real--simulación fue de $2.0995\,\text{cm}$. No se registraron muestras saturadas en la simulación. En ambos casos los pulsos permanecieron dentro del intervalo permitido de $[1100,2000]\,\mu\text{s}$. Por lo tanto, el mayor sobrepaso observado no se explica por una saturación del comando registrado. Los resultados muestran que el modelo nominal subestima el sobrepaso y no reproduce el desplazamiento final de la planta real. Entre las posibles causas se encuentran el rozamiento no representado, las diferencias entre la dinámica real y la identificada, y un desajuste del punto de equilibrio; este ensayo no permite distinguir sus contribuciones por separado.
-
-    El error medio final real evidencia una diferencia persistente respecto de la consigna en la ventana observada, aunque la duración del registro no permite asegurar que sea el error de estado estacionario definitivo. Este resultado se utilizará como referencia para evaluar si la incorporación de acción integral reduce el error final respecto del controlador proporcional.
+    A partir de la Fig. \ref{fig:p_comparacion_escalon}, se observa que la respuesta de la planta real presenta un comportamiento más oscilatorio que el simulado, lo que evidencia un menor amortiguamiento. La respuesta real alcanza un estado estacionario luego de aproximadamente $$10\,\text{s}$$, estabilizándose en torno a $$10{,}6\,\text{cm}$$. Por lo tanto, a diferencia de lo observado en la simulación, el controlador proporcional aplicado a la planta real no logra alcanzar la referencia impuesta, sino que presenta un error en estado estacionario.
 
     \subsubsection{Comparación experimental ante un golpe}
     Con la referencia fija en cero se aplicó un ligero golpe al carrito y se guardó el ensayo en \texttt{controlador\_proporcional\_golpe.mat}. La comparación se realizó mediante \texttt{comparar\_golpe.m}, tomando como inicio de la perturbación $t=2.089\,\text{s}$ del registro original. Para representar el sentido del movimiento observado, en esta comparación se utilizó un salto de velocidad simulado de $-5\,\text{cm/s}$, dirigido hacia el sensor. Su amplitud es ilustrativa y no corresponde a una medición de la intensidad del golpe real.
 
     La Tabla~\ref{tab:p_comparacion_golpe} resume la comparación ante el golpe. El registro real no permaneció dentro de la banda de $\pm0.2\,\text{cm}$ hasta el final del ensayo. No hubo muestras en los límites del comando ni saturaciones en la simulación.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comparación real y simulada ante un golpe con control P. El error final es el promedio de $r-y$ en los últimos $2\,\text{s}$.}
         \label{tab:p_comparacion_golpe}
@@ -820,15 +808,15 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_golpe_P.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_golpe_P.eps}
         \caption{Respuesta real y simulada con control proporcional ante una perturbación sobre el carrito, con referencia nula. El origen temporal corresponde al inicio seleccionado del golpe; la amplitud del impulso real no está medida.}
         \label{fig:p_comparacion_golpe}
     \end{figure}
 
-    La planta real regresó hacia la zona de referencia tras la perturbación, aunque conservó un desplazamiento final. Antes del golpe, la mediana de posición en el primer segundo ya era de $-0.1102\,\text{cm}$; este desplazamiento se mantuvo en las curvas, sin corregirlo. Por lo tanto, el error final no puede atribuirse solamente al golpe. La comparación es cualitativa, ya que difieren tanto la condición inicial de posición como la intensidad de la perturbación: la diferencia entre los máximos no permite cuantificar por sí sola el error del modelo. El desplazamiento persistente observado, también presente en el ensayo de escalón, motiva evaluar la incorporación de acción integral.
+    En este caso, se observa nuevamente que la planta real presenta un pico de respuesta considerablemente mayor que el simulado, alcanzando una amplitud aproximadamente 15 veces superior. Además, al igual que en la respuesta al escalón, la planta real no regresa a su posición inicial, sino que se estabiliza $$0{,}6\,\text{cm}$$ por encima de esta. Por último, se obtiene un tiempo de establecimiento de aproximadamente $$2\,\text{s}$$ para la respuesta al impulso.
 
     \subsection{Control proporcional-integral}
     Para reducir el error persistente observado con el control proporcional se propone incorporar una acción integral:
@@ -845,12 +833,12 @@
     Por lo tanto, $K_p=12.589254\,\mu\text{s}/\text{cm}$ y $K_i=6.294627\,\mu\text{s}/(\text{cm}\,\text{s})$. La reducción de la ganancia proporcional acompaña la incorporación de la integral, teniendo en cuenta el elevado sobrepaso observado en la planta real con el P.
 
     \subsubsection{Márgenes de estabilidad y respuesta continua}
-    Para el lazo abierto compensado $L_{PI}(s)=C_{PI}(s)G_P(s)$ se obtuvo un margen de fase de $54.5\degree$ a la frecuencia de cruce de ganancia $\omega_{gc}=1.77\,\text{rad/s}$, y un margen de ganancia de $21\,\text{dB}$ a la frecuencia de cruce de fase $\omega_{pc}=10.3\,\text{rad/s}$. Frente al P diseñado, disminuyen tanto la frecuencia de cruce como el margen de fase, mientras que aumenta el margen de ganancia.
+    Para el lazo abierto compensado $L_{PI}(s)=C_{PI}(s)G_P(s)$ se obtuvo un margen de fase de $53\degree$ a la frecuencia de cruce de ganancia $\omega_{gc}=1.65\,\text{rad/s}$, y un margen de ganancia de $23.7\,\text{dB}$ a la frecuencia de cruce de fase $\omega_{pc}=11.1\,\text{rad/s}$. Frente al P diseñado, disminuyen tanto la frecuencia de cruce como el margen de fase, mientras que aumenta el margen de ganancia.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la captura del Bode continuo del PI:
-        \includegraphics[width=0.95\textwidth]{imagenes/bode_con_PI.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/bode_con_PI.eps}
         \caption{Diagrama de Bode del lazo abierto con control PI: margen de fase de $54.5\degree$ y margen de ganancia de $21\,\text{dB}$.}
         \label{fig:bode_control_pi}
     \end{figure}
@@ -883,7 +871,7 @@
     \subsubsection{Simulación digital del escalón de posición}
     Con el script \texttt{disenar\_control.m} se simuló un escalón de $0$ a $10\,\text{cm}$ en $t=2\,\text{s}$, partiendo del reposo y de posición cero, con $c=0$. La planta se discretizó con ZOH y el controlador con Tustin. Se incluyeron la saturación del pulso a $[1100,2000]\,\mu\text{s}$ y el redondeo a microsegundos enteros. La recurrencia utiliza la salida limitada, sin redondear, como memoria del controlador, de la misma manera que el programa de Arduino.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Respuesta simulada al escalón de $10\,\text{cm}$ con control PI digital, límites y redondeo.}
         \label{tab:pi_escalon_simulado}
@@ -902,11 +890,11 @@
 
     La respuesta digital conserva un comportamiento cercano al continuo: el establecimiento es de aproximadamente $5.17\,\text{s}$ y el sobrepaso es de $22.99\,\%$, sin alcanzar los límites del actuador. El error estacionario del modelo digital lineal fue numéricamente $1.3101\times10^{-13}\,\text{cm}$, compatible con cero. Como el modelo nominal con P ya tenía error nulo al escalón, esta simulación con $c=0$ no demuestra una mejora del error final por la integral. Su efecto sobre el desplazamiento persistente observado deberá evaluarse con el ensayo real.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por disenar_control.m: TP2/PI_escalon_simulado.png.
         % Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/PI_escalon_simulado.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/PI_escalon_simulado.eps}
         \caption{Respuesta simulada con control PI ante un escalón de posición de $10\,\text{cm}$: modelos continuo, digital lineal y digital con límites y redondeo, junto con el comando del servo.}
         \label{fig:pi_escalon_simulado}
     \end{figure}
@@ -914,11 +902,11 @@
     \subsubsection{Simulación de una perturbación impulsiva}
     Como evaluación adicional, se mantuvo la referencia en cero y se introdujo un salto de velocidad de $5\,\text{cm/s}$ en $t=5\,\text{s}$, con las mismas condiciones nominales utilizadas para el P. El máximo desplazamiento absoluto posterior al golpe fue de $0.57505\,\text{cm}$. El comando permaneció entre $1536$ y $1545\,\mu\text{s}$, sin muestras saturadas. La amplitud del salto es ilustrativa y permite comparar ambos controladores bajo la misma perturbación simulada.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por disenar_control.m: TP2/PI_golpe_simulado.png.
         % Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/PI_golpe_simulado.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/PI_golpe_simulado.eps}
         \caption{Respuesta simulada con control PI digital ante un salto de velocidad de $5\,\text{cm/s}$ en $t=5\,\text{s}$, con referencia nula.}
         \label{fig:pi_golpe_simulado}
     \end{figure}
@@ -926,7 +914,7 @@
     \subsubsection{Comparación experimental del escalón de posición}
     Se repitió el ensayo de referencia de $0$ a $10\,\text{cm}$ con el controlador PI implementado en su forma bilineal. El registro se procesó mediante el comparador generalizado \texttt{comparar\_escalon\_P.m}, utilizando $C_{PI}(s)$ de la ecuación~\ref{eq:pi_sintonia}. Se alinearon temporalmente las respuestas en el instante del escalón y se conservaron las posiciones medidas, expresadas respecto de la referencia experimental. No se detectaron muestras inválidas.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comparación real y simulada del escalón de $10\,\text{cm}$ con control PI. El error final es el promedio de $r-y$ en los últimos $2\,\text{s}$.}
         \label{tab:pi_comparacion_escalon}
@@ -943,25 +931,29 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por el comparador: TP2/comparacion_escalon_PI.png.
         % Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_escalon_PI.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_escalon_PI.eps}
         \caption{Comparación experimental y simulada del escalón de $10\,\text{cm}$ con control PI, con origen temporal en el cambio de referencia. Se incluyen la posición y el comando del servo.}
         \label{fig:pi_comparacion_escalon}
     \end{figure}
 
     La planta real alcanzó aproximadamente $12.1136\,\text{cm}$, con un sobrepaso de $21.136\,\%$, ligeramente menor que el $22.987\,\%$ previsto por el modelo. El RMSE entre las posiciones real y simulada fue de $1.6322\,\text{cm}$ en el intervalo comparado. Los pulsos registrados y simulados permanecieron dentro de $[1100,2000]\,\mu\text{s}$ y no se registraron muestras saturadas en la simulación.
 
-    Respecto del ensayo con P, el sobrepaso real disminuyó de $76.451\,\%$ a $21.136\,\%$, una reducción de aproximadamente $55.315$ puntos porcentuales. La magnitud del error medio final pasó de $1.2265\,\text{cm}$ a $0.72348\,\text{cm}$, aproximadamente un $41.0\,\%$ menor. La posición media final con PI fue, por tanto, cercana a $10.72348\,\text{cm}$. Este resultado es consistente con el efecto esperado de la acción integral sobre un error persistente, aunque entre ambos ensayos también se modificó la ganancia proporcional y no puede atribuirse todo el cambio exclusivamente a la integral.
+    Respecto del ensayo con P, el sobrepaso real disminuyó de $76.451\,\%$ a $21.136\,\%$, una reducción de aproximadamente $55.315$ puntos porcentuales. La magnitud del error medio final pasó de $1.2265\,\text{cm}$ a $0{,}72348\,\text{cm}$, aproximadamente un $41{,}0\,\%$ menor. La posición media final con PI fue, por tanto, cercana a $10{,}72348\,\text{cm}$. Este resultado es consistente con el efecto esperado de la acción integral sobre un error persistente, aunque entre ambos ensayos también se modificó la ganancia proporcional y no puede atribuirse todo el cambio exclusivamente a la integral.
 
-    El error medio final quedó fuera de la tolerancia de $\pm0.2\,\text{cm}$ y las muestras reales no permanecieron en esa banda hasta el final del registro; por eso no se obtuvo un tiempo de establecimiento al $2\,\%$. En los ensayos realizados, el PI redujo el sobrepaso y la magnitud del error medio final frente al P, pero no alcanzó la precisión de seguimiento requerida. Aunque los sobrepasos real y simulado fueron cercanos, persistieron diferencias en la respuesta y en el error final. El error informado corresponde a la ventana final observada y no garantiza el valor asintótico del error de estado estacionario.
+    El error medio final quedó fuera de la tolerancia de $\pm0.2\,\text{cm}$ y las muestras reales no permanecieron en esa banda hasta el final del registro; por eso no se obtuvo un tiempo de establecimiento al $2\,\%$. En los ensayos realizados, el PI redujo el sobrepaso y la magnitud del error medio final frente al P, pero no alcanzó la precisión de seguimiento requerida. Aunque los sobrepasos real y simulado fueron cercanos, persistieron diferencias en la respuesta y en el error final.
+
+    Cabe mencionar que, se observó el siguiente comportamiento al aproximarse a la referencia impuesta. Debido a que el error no llegaba a anularse, este se acumulaba progresivamente, provocando una inclinación cada vez mayor de la barra. Como consecuencia del rozamiento estático del carrito, este permanecía inmóvil hasta que la inclinación alcanzaba un valor suficiente para vencerlo. Una vez superado este umbral, el carrito se desplazaba bruscamente, sobrepasando la posición de referencia en lugar de detenerse en ella.
+
+    Este comportamiento daba lugar a oscilaciones alrededor de la referencia. Por ejemplo, para una posición de referencia de $$10\,\text{cm}$$, el carrito podía detenerse en $$9{,}3\,\text{cm}$$, mientras el error continuaba acumulándose. Cuando la inclinación de la barra era suficiente para vencer el rozamiento estático, el carrito se desplazaba hasta alcanzar, por ejemplo, $$10{,}5\,\text{cm}$$, sobrepasando la referencia. El proceso se repetía en sentido contrario, generando un movimiento oscilatorio alrededor de la posición deseada.
 
     \subsubsection{Comparación experimental ante un golpe}
     Se mantuvo la referencia en cero y se aplicó un ligero golpe al carrito con el controlador PI activo. El ensayo se procesó mediante \texttt{comparar\_golpe.m}, fijando el inicio de la perturbación en $t=2.771\,\text{s}$ del registro original. Para la comparación se utilizó un salto de velocidad simulado de $-5\,\text{cm/s}$, dirigido hacia el sensor, con el modelo nominal sin sesgo y el controlador discretizado mediante Tustin.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comparación real y simulada ante un golpe con control PI. La recuperación se evalúa respecto de la banda fija de $\pm0.2\,\text{cm}$ alrededor de la referencia nula.}
         \label{tab:pi_comparacion_golpe}
@@ -979,24 +971,16 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por comparar_golpe(..., 'PI', ...):
         % TP2/comparacion_golpe_PI.png. Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_golpe_PI.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_golpe_PI.eps}
         \caption{Respuesta real y simulada con control PI ante una perturbación sobre el carrito, con referencia nula. El origen temporal corresponde al inicio seleccionado del golpe; la intensidad del impulso real no está medida.}
         \label{fig:pi_comparacion_golpe}
     \end{figure}
 
-    El desplazamiento máximo real fue mayor que el simulado y la respuesta medida no permaneció dentro de la banda de $\pm0.2\,\text{cm}$ hasta el final del registro. El error medio final de $-0.21092\,\text{cm}$ corresponde a una posición media de $0.21092\,\text{cm}$, mientras que la simulación regresó prácticamente a cero. La mediana real del primer segundo era de $0.2995\,\text{cm}$ y se conservó sin corregir las curvas. No se alcanzaron los límites del comando, por lo que la saturación registrada no explica las diferencias observadas.
-
-    En este ensayo, la magnitud del error medio final con PI fue de $0.21092\,\text{cm}$ frente a $0.70445\,\text{cm}$ con P. Aunque el error medio final y el máximo desplazamiento real fueron menores con PI, las intensidades de los golpes no están medidas y las condiciones iniciales y ventanas de observación difieren; por ello, la comparación es cualitativa y estos valores no permiten concluir que un controlador rechace mejor la misma perturbación que el otro. En las simulaciones, con igual magnitud del salto de velocidad, el PI recuperó la banda en $0.82\,\text{s}$ frente a $0.68\,\text{s}$ del P.
-
-    El PI redujo la magnitud del error medio final respecto del P en los ensayos de escalón y golpe, aunque en este último la respuesta real no permaneció dentro de la banda de recuperación. No puede determinarse la causa del desplazamiento persistente solamente con estas métricas: será necesario revisar el registro y la implementación para distinguir entre efectos de la planta, de la medición y del controlador. El promedio final informado describe la ventana observada y no demuestra por sí solo un error de estado estacionario asintótico.
-
-    Cabe mencionar que, tanto ante una entrada tipo golpe como ante una entrada tipo escalón, se observó un comportamiento similar al aproximarse a la referencia impuesta. Debido a que el error no llegaba a anularse, este se acumulaba progresivamente, provocando una inclinación cada vez mayor de la barra. Como consecuencia del rozamiento estático del carrito, este permanecía inmóvil hasta que la inclinación alcanzaba un valor suficiente para vencerlo. Una vez superado este umbral, el carrito se desplazaba bruscamente, sobrepasando la posición de referencia en lugar de detenerse en ella.
-
-    Este comportamiento daba lugar a oscilaciones alrededor de la referencia. Por ejemplo, para una posición de referencia de $$10,\text{cm}$$, el carrito podía detenerse en $$9{,}3,\text{cm}$$, mientras el error continuaba acumulándose. Cuando la inclinación de la barra era suficiente para vencer el rozamiento estático, el carrito se desplazaba hasta alcanzar, por ejemplo, $$10{,}5,\text{cm}$$, sobrepasando la referencia. El proceso se repetía en sentido contrario, generando un movimiento oscilatorio alrededor de la posición deseada.
+    Se observa que la respuesta se estabiliza prácticamente en $$0\,\text{cm}$$, alcanzando la posición esperada, a diferencia de lo ocurrido con el controlador proporcional. El tiempo de establecimiento fue de aproximadamente $$3{,}1\,\text{s}$$.
 
     \subsection{Control proporcional-derivativo}
     Para mejorar el amortiguamiento y reducir las oscilaciones observadas en los ensayos anteriores se diseñó un controlador proporcional-derivativo con filtro. Se eligió un cero en $s=-3\,\text{rad/s}$ y un polo de filtrado en $s=-6\,\text{rad/s}$, con factor de ganancia $10^{24/20}$:
@@ -1013,10 +997,10 @@
     \]
     El factor $10^{24/20}=15.848932$ corresponde a la ganancia de alta frecuencia de esta transferencia, mientras que su ganancia estática es $K_p$. El filtro limita la ganancia de la acción derivativa a altas frecuencias. Se evaluó esta sintonía buscando una respuesta amortiguada y comandos dentro del intervalo operativo. Los resultados siguientes verifican esa condición para los ensayos simulados, pero no demuestran que se haya alcanzado la mayor rapidez posible entre todas las sintonías admisibles. Inicialmente se evaluó una sintonía orientada a un margen de fase de $60\degree$, pero se descartó porque el comportamiento obtenido fue inestable. Por este motivo, no se mantuvo ese margen como objetivo y se adoptó la sintonía presentada.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Reemplazar el recuadro por la captura del Bode del PD:
-        \includegraphics[width=0.95\textwidth]{imagenes/bode_control_pd.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/bode_control_pd.eps}
         \caption{Diagrama de Bode del lazo abierto con el controlador PD filtrado: margen de fase de $87.2\degree$ y margen de ganancia de $23.5\,\text{dB}$.}
         \label{fig:bode_control_pd}
     \end{figure}
@@ -1042,7 +1026,7 @@
     \subsubsection{Simulación digital del escalón de posición}
     Se repitió la simulación del escalón de $0$ a $10\,\text{cm}$ en $t=2\,\text{s}$, partiendo del reposo y con $c=0$. Se utilizó la planta discretizada con ZOH y la recurrencia del controlador bilineal, incluyendo los límites y el redondeo del pulso como en el programa de Arduino.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Respuesta simulada al escalón de $10\,\text{cm}$ con control PD digital, límites y redondeo.}
         \label{tab:pd_escalon_simulado}
@@ -1063,11 +1047,11 @@
 
     El error estacionario del modelo digital lineal fue numéricamente $-1.9984\times10^{-14}\,\text{cm}$, compatible con cero. En cambio, la simulación con redondeo presentó un error medio final de $0.05819\,\text{cm}$. La cuantización del comando puede sostener pequeños errores: para este PD, con $K_p=7.924466\,\mu\text{s}/\text{cm}$, un error constante inferior a aproximadamente $0.5/K_p=0.0631\,\text{cm}$ puede generar una corrección que se redondea a cero microsegundos respecto del centro. El error obtenido es compatible con ese mecanismo y permanece dentro de la banda de $\pm0.2\,\text{cm}$.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por disenar_control.m: TP2/PD_escalon_simulado.png.
         % Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/PD_escalon_simulado.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/PD_escalon_simulado.eps}
         \caption{Respuesta simulada con control PD filtrado ante un escalón de posición de $10\,\text{cm}$: modelos continuo, digital lineal y digital con límites y redondeo, junto con el comando del servo.}
         \label{fig:pd_escalon_simulado}
     \end{figure}
@@ -1075,11 +1059,11 @@
     \subsubsection{Simulación de una perturbación impulsiva}
     Con la referencia fija en cero se introdujo un salto de velocidad de $5\,\text{cm/s}$ en $t=5\,\text{s}$, manteniendo las condiciones nominales de los ensayos simulados anteriores. El máximo desplazamiento absoluto posterior al golpe fue de $0.57390\,\text{cm}$. El pulso permaneció entre $1538$ y $1544\,\mu\text{s}$, sin muestras saturadas. La amplitud del salto es ilustrativa y no constituye una medición del impulso real.
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por disenar_control.m: TP2/PD_golpe_simulado.png.
         % Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/PD_golpe_simulado.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/PD_golpe_simulado.eps}
         \caption{Respuesta simulada con control PD digital ante un salto de velocidad de $5\,\text{cm/s}$ en $t=5\,\text{s}$, con referencia nula.}
         \label{fig:pd_golpe_simulado}
     \end{figure}
@@ -1087,7 +1071,7 @@
     \subsubsection{Comparación experimental del escalón de posición}
     Se aplicó el escalón de referencia de $0$ a $10\,\text{cm}$ a la planta real con el PD filtrado implementado mediante Tustin. Se utilizó el comparador generalizado \texttt{comparar\_escalon.m}, alineando el instante del escalón y conservando las posiciones medidas sin desplazamientos adicionales. No se detectaron muestras inválidas.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comparación real y simulada del escalón de $10\,\text{cm}$ con control PD. El error final es el promedio de $r-y$ en los últimos $2\,\text{s}$.}
         \label{tab:pd_comparacion_escalon}
@@ -1104,25 +1088,25 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por el comparador: TP2/comparacion_escalon_PD.png.
         % Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_escalon_PD.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_escalon_PD.eps}
         \caption{Comparación experimental y simulada del escalón de $10\,\text{cm}$ con control PD filtrado. El origen temporal corresponde al cambio de referencia; se incluyen posición y comando del servo.}
         \label{fig:pd_comparacion_escalon}
     \end{figure}
 
-    Tanto la respuesta real como la simulada presentaron sobrepaso nulo. Sin embargo, la planta real conservó un error medio final de $5.6816\,\text{cm}$, equivalente a una posición media de $4.3184\,\text{cm}$ en los últimos $2\,\text{s}$, frente a una referencia de $10\,\text{cm}$. No permaneció dentro de la banda de $10\pm0.2\,\text{cm}$ hasta el final del registro, por lo que no se obtuvo un tiempo de establecimiento al $2\,\%$. La ausencia de sobrepaso no implica por sí sola un seguimiento satisfactorio de la referencia.
+    Tanto la respuesta real como la simulada presentaron sobrepaso nulo (o sea, una respuesta sobreamortiguada). Sin embargo, la planta real conservó un error medio final de $5.6816\,\text{cm}$, equivalente a una posición media de $4.3184\,\text{cm}$ en los últimos $2\,\text{s}$, frente a una referencia de $10\,\text{cm}$. Esto se debe a la ausencia del integrador para acumular el error.
 
-    El RMSE real--simulación fue de $5.1677\,\text{cm}$ en el intervalo comparado. Los pulsos registrados permanecieron entre $1576$ y $1685\,\mu\text{s}$, dentro del intervalo permitido, de modo que el error observado no se explica por una saturación del comando. Además, su magnitud es considerablemente mayor que el error asociado al redondeo en la simulación nominal. No se registraron muestras saturadas en la simulación. El modelo lineal con un integrador en la planta predice error nulo al escalón, pero no representa todos los efectos del montaje real. El rozamiento estático, un desajuste del equilibrio u otras diferencias de modelado podrían contribuir a la discrepancia; estas métricas no permiten identificar la causa por separado ni asegurar que se haya alcanzado un régimen estacionario definitivo.
+    El modelo lineal con un integrador en la planta predice un error nulo ante una entrada escalón, pero no contempla todos los efectos presentes en el montaje real. La discrepancia observada podría deberse al rozamiento estático, a un desajuste en la posición de equilibrio o a otras diferencias entre el modelo y la planta real. Sin embargo, las métricas obtenidas no permiten identificar por separado la contribución de cada uno de estos factores ni asegurar que se haya alcanzado un régimen estacionario definitivo.
 
-    Frente a los ensayos con P y PI, el PD elegido eliminó el sobrepaso medido, a costa de un error medio final mayor: $5.6816\,\text{cm}$ frente a $-1.2265\,\text{cm}$ y $-0.72348\,\text{cm}$, respectivamente. Esta comparación también incluye cambios de ganancia y condiciones experimentales, por lo que no permite atribuir todo el comportamiento exclusivamente a la derivada. La sintonía ensayada mejoró el sobrepaso, pero no logró la precisión de seguimiento requerida; tampoco permite afirmar una mejora de rapidez respecto del P, ya que la respuesta real no se estableció alrededor de la consigna.
+    En comparación con los controladores P y PI, el controlador PD seleccionado permitió eliminar el sobrepaso medido, aunque presentó un mayor error medio final, de $5{,}6816\,\text{cm}$, frente a $-1{,}2265\,\text{cm}$ y $-0{,}72348\,\text{cm}$, respectivamente. Este resultado es compatible con el efecto amortiguador de la acción derivativa, que tiende a oponerse a las variaciones rápidas del error y puede reducir las oscilaciones y el sobrepaso. No obstante, la acción derivativa no elimina por sí misma el error en estado estacionario, lo que podría contribuir a explicar la diferencia observada respecto de los controladores P y PI.
 
     \subsubsection{Comparación experimental ante un golpe}
     Con la referencia fija en cero se aplicó un ligero golpe al carrito y se comparó el registro con la simulación del PD mediante \texttt{comparar\_golpe.m}. Se fijó el inicio de la perturbación en $t=7.895\,\text{s}$ del registro original. Se utilizó un salto de velocidad simulado de $-5\,\text{cm/s}$, dirigido hacia el sensor. La mediana de posición real del primer segundo fue de $-0.3151\,\text{cm}$ y se conservó sin corregir las curvas, mientras que la simulación partió de posición cero. La intensidad del impulso real no fue medida, por lo que la comparación de amplitudes es cualitativa.
 
-    \begin{table}[H]
+    \begin{table}[!htbp]
         \centering
         \caption{Comparación real y simulada ante un golpe con control PD. La recuperación se evalúa respecto de la banda fija de $\pm0.2\,\text{cm}$ alrededor de la referencia nula.}
         \label{tab:pd_comparacion_golpe}
@@ -1140,18 +1124,18 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[H]
+    \begin{figure}[!htbp]
         \centering
         % Imagen generada por comparar_golpe(..., 'PD', ...):
         % TP2/comparacion_golpe_PD.png. Reemplazar el recuadro y descomentar:
-        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_golpe_PD.png}
+        \includegraphics[width=0.95\textwidth]{imagenes/comparacion_golpe_PD.eps}
         \caption{Respuesta real y simulada con control PD filtrado ante un golpe, con referencia nula. Las curvas se alinean en el inicio seleccionado de la perturbación y conservan sus posiciones originales.}
         \label{fig:pd_comparacion_golpe}
     \end{figure}
 
-    Ante la perturbación tipo golpe, se observa una diferencia significativa entre la respuesta simulada y la real. Mientras que la simulación recuperó la banda de referencia en aproximadamente $$1{,}3\,\text{s}$$ y presentó un error medio final de apenas $$0{,}057064\,\text{cm}$$, la planta real alcanzó un desplazamiento absoluto de $$9{,}7391\,\text{cm}$$ y no logró regresar a dicha banda durante el registro. El error medio final de $$9{,}1866\,\text{cm}$$, correspondiente a una posición media de $$-9{,}1866\,\text{cm}$$, evidencia que el sistema permaneció desplazado respecto de la posición de equilibrio. Por lo tanto, si bien el modelo predice una recuperación satisfactoria, el controlador PD ensayado no consiguió rechazar eficazmente la perturbación en el montaje real.
+    Ante la perturbación tipo golpe, se observa una diferencia significativa entre la respuesta simulada y la real. Mientras que la simulación recuperó la banda de referencia en aproximadamente $1{,}3\,\text{s}$ y presentó un error medio final de apenas $0{,}057064\,\text{cm}$, la planta real alcanzó un desplazamiento absoluto de $9{,}7391\,\text{cm}$ y no logró regresar a dicha banda durante el registro. El error medio final de $9{,}1866\,\text{cm}$, correspondiente a una posición media de $-9{,}1866\,\text{cm}$, evidencia que el sistema permaneció desplazado respecto de la posición de equilibrio. Por lo tanto, si bien el modelo predice una recuperación satisfactoria, el controlador PD ensayado no consiguió rechazar eficazmente la perturbación en el montaje real.
 
-Esta diferencia puede relacionarse con las limitaciones de la acción derivativa frente a una perturbación de este tipo. A diferencia del término integral, la acción derivativa no acumula el error a lo largo del tiempo, sino que responde a su velocidad de variación. Por ello, aunque puede contribuir a amortiguar el movimiento y reducir las oscilaciones, no garantiza que el sistema elimine el desplazamiento residual provocado por el golpe. Además, los comandos reales permanecieron entre $$1544$$ y $$1637\,\mu\text{s}$$, sin alcanzar los límites del actuador, por lo que no hay evidencia de que la saturación haya impedido la recuperación. El resultado sugiere que la sintonía ensayada no proporcionó una acción de control suficiente para recuperar la referencia en las condiciones reales del experimento. Sin embargo, dado que no se conoce la intensidad exacta del golpe y existen diferencias entre el modelo y el montaje, no es posible atribuir el comportamiento exclusivamente al controlador PD.   
+    Esta diferencia puede relacionarse con las limitaciones de la acción derivativa frente a una perturbación de este tipo. A diferencia del término integral, la acción derivativa no acumula el error a lo largo del tiempo, sino que responde a su velocidad de variación. Por ello, aunque puede contribuir a amortiguar el movimiento y reducir las oscilaciones, no garantiza que el sistema elimine el desplazamiento residual provocado por el golpe. Además, los comandos reales permanecieron entre $1544$ y $1637\,\mu\text{s}$, sin alcanzar los límites del actuador, por lo que no hay evidencia de que la saturación haya impedido la recuperación. El resultado sugiere que la sintonía ensayada no proporcionó una acción de control suficiente para recuperar la referencia en las condiciones reales del experimento. Sin embargo, dado que no se conoce la intensidad exacta del golpe y existen diferencias entre el modelo y el montaje, no es posible atribuir el comportamiento exclusivamente al controlador PD.
 
     \section{Conclusiones}
     El modelo obtenido permitió diseñar y simular los controladores, pero las respuestas reales mostraron diferencias importantes respecto de las simuladas. Esto indica que el modelo no representa todos los efectos del montaje, como el rozamiento del carrito y posibles desajustes de la posición de equilibrio.
@@ -1160,9 +1144,4 @@ Esta diferencia puede relacionarse con las limitaciones de la acción derivativa
 
     Ante los golpes, las simulaciones recuperaron la referencia, mientras que los ensayos reales conservaron errores y no alcanzaron la banda de recuperación. Como la intensidad de los golpes reales no fue medida, estos resultados no permiten comparar directamente la capacidad de rechazo de los tres controladores.
 
-    Para mejorar el funcionamiento sería conveniente revisar el equilibrio de la barra, considerar el rozamiento en el modelo y ajustar nuevamente las ganancias mediante ensayos reales. Los resultados muestran que una buena respuesta en simulación debe comprobarse siempre en el montaje experimental.
-
     \end{document}
-
-
-
