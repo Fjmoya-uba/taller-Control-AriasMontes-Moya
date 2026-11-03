@@ -1,0 +1,47 @@
+%% Modelo del servo Planta
+clear; clc; close all;
+
+% Estados: x = [theta; omega]
+% theta en radianes, omega en rad/s
+% Entrada: variación del pulso del servo en microsegundos
+
+A = [0       1;
+    -967.5 -50.12];
+
+B = [0;
+     36.82*pi/180];
+
+C = [1 0];
+D = 0;
+
+Ts = 0.02; % Tiempo de muestreo: 20 ms
+
+%% Verificar controlabilidad
+Co = ctrb(A, B);
+rango = rank(Co)
+
+% Polos actuales de la planta
+polos_planta = eig(A)
+
+%% Calcular la realimentacion de estados
+polos_deseados = [-20 -30];
+
+K = place(A, B, polos_deseados)
+
+%% Matrices ampliadas con el integrador -> Agregamos el H para la referencia.
+A_amp = [ A,         [0; 0];
+         -C,           0   ];
+
+B_amp = [ B; 
+          0 ];
+
+% Ahora tenemos 3 estados, así que elegimos 3 polos deseados:
+% Dos polos para la barra y uno para el integrador (buscamos
+% que sea más lento
+polos_deseados = [-20, -30, -0.5];
+
+%place nos devuelve un vector de 3 ganancias: K_amp = [k_theta, k_omega, -H]
+K_amp = place(A_amp, B_amp, polos_deseados);
+
+K = K_amp(1:2) % Ganancias de estado
+H = -K_amp(3)  % Ganancia del integrador

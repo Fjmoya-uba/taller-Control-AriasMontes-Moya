@@ -79,6 +79,7 @@ fprintf('Muestras saturadas en simulacion: %d\n',saturadas);
 
 figure('Color','white','Name',[char(nombre) ': escalon real vs simulado']);
 subplot(2,1,1);
+% Graficar la misma simulacion digital usada arriba para las metricas.
 plot(t,r,':k',t,y,'b',ts,ys,'--r'); grid on; hold on;
 yline(10.2, ':', 'Banda 2 %'); yline(9.8, ':');
 ylabel('Posicion [cm]'); legend('Referencia','Real','Simulada','Location','best');

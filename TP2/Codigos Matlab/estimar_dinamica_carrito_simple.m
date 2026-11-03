@@ -5,7 +5,7 @@
 clear; clc; close all;
 
 %% 1. Leer las mediciones
-datos = load('mediciones_dinamica_carrito_1.mat');
+datos = load('Correcciones/mediciones_dinamica_carrito_1_corregida.mat');
 tiempo = double(datos.out.tout(:));
 angulo = double(datos.out.d1(:));             % Grados, cero horizontal
 posicion = double(datos.out.d2(:)) - 15.612;  % Centimetros

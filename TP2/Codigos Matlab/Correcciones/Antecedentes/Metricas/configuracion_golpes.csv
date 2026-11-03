@@ -1,0 +1,4 @@
+controlador,instante_detectado_s,salto_supuesto_cm_s,umbral_cm
+P,5.2,-5,1.21494823722839
+PI,3.54,-5,0.607478360366821
+PD,7.98,-5,1.21495672073364

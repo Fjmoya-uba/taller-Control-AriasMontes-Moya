@@ -183,8 +183,6 @@
 
     % INICIO DEL DOCUMENTO
 
-    \raggedbottom
-
     \begin{document}
 
     \begin{titlepage}
@@ -249,7 +247,7 @@
 
     Se define la salida del sistema como la posición longitudinal del carrito, $y=p$, expresada en centímetros. Se fija $p=0$ tomando la posición en la que el centro del carrito se encuentra alineado con la línea transversal correspondiente a la unión de las dos piezas de la barra (ver fig. \ref{fig:cero-carrito}), próxima a su centro. El sentido positivo corresponde al alejamiento respecto del sensor ultrasónico.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         \includegraphics[width=0.5\textwidth]{imagenes/cero-carrito.jpeg}
         \caption{Posición $0 \text{cm}$ para el carrito.}
@@ -264,7 +262,7 @@
 
     Para contrastar las lecturas se midió con regla la distancia $L$ desde el sensor hasta la cara más alejada del carrito. Por lo tanto, la distancia geométrica comparable con $d$ es $L-l_c$. En la referencia se obtuvo $L_0=21.7\,\text{cm}$, de modo que el desplazamiento independiente medido con regla es $p_{\text{regla}}=L-L_0$. La Tabla~\ref{tab:medicion_carrito} presenta los datos en el orden registrado. Las diferencias absolutas entre $d$ y $L-l_c$ pueden incluir diferencias en el origen físico de medición, así como errores propios a la hora de tomar las mediciones; no se aplicó una corrección adicional a los datos.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comparación de la posición del carrito obtenida con el sensor y con regla. Todas las distancias se expresan en centímetros.}
         \label{tab:medicion_carrito}
@@ -307,7 +305,7 @@
 
     La Tabla~\ref{tab:valores_sistema} presenta los resultados del ensayo. En los extremos operativos se midieron $\theta_b=-16.71\degree$ para $1100\,\mu\text{s}$ y $\theta_b=17.87\degree$ para $2000\,\mu\text{s}$. Se adoptan estos valores como límites observados de inclinación en operación, $\theta_b\in[-16.71\degree; 17.87\degree]$. La restricción implementada consiste en saturar el comando del servo a $u\in[1100,2000]\,\mu\text{s}$. Los límites angulares corresponden a las mediciones realizadas en los extremos de comando para el montaje ensayado. No representan una medición de todos los topes mecánicos ni garantizan por sí solos la validez del modelo lineal en todo el intervalo.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comandos aplicados, coordenadas nominales del servo e inclinación medida de la barra.}
         \label{tab:valores_sistema}
@@ -337,7 +335,7 @@
 
     A modo de resúmen se presentan en la Tabla \ref{tab:valores_lim} los rangos considerados para las variables en cuestión:
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \begingroup
         \small
@@ -356,7 +354,7 @@
     \end{table}
 
     En la fig.~\ref{fig:sist_de_ref} se incluye un esquema con las variables y sus sentidos de referencia:
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         \includegraphics[width=0.75\textwidth]{imagenes/ball_and_beam_servo.png}
         \caption{Sistema de referencia de la planta}
@@ -425,7 +423,7 @@
     donde $\mathcal V$ es el conjunto de muestras de validación y $N_v=693$. El resultado respalda el uso del modelo discreto para representar la dinámica comando--ángulo bajo las condiciones del ensayo. Estas métricas corresponden exclusivamente a $G_{sb,d}(z)$; no se atribuyen al modelo continuo ni a la planta completa con el carrito.
 
     Por otro lado, en la fig. \ref{fig:validacion_servo_barra} se graficó también la respuesta a la entrada de la planta contínua estimada con la respuesta real de la planta.
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         \includegraphics[width=0.8\textwidth]{imagenes/salida_real_vs_simulada_servo_barra.eps}
         \caption{Comparación experimental del modelo identificado del conjunto servomotor--barra}
@@ -460,7 +458,7 @@
 
     Para comparar ambas respuestas, se simuló la respuesta de ambos modelos ante el mismo tren de excitaciones y se los comparó contra la salida real medida. Dicho gráfico se puede ver en la figura \ref{fig:comparacion_con_sin_delay}.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         \includegraphics[width=0.8\textwidth]{imagenes/comparacion_servo_barra_con_sin_delay.eps}
         \caption{Comparación de respuestas de los modelos con y sin retardo}
@@ -538,7 +536,7 @@
     \end{tabular}
     \end{center}
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         \includegraphics[width=1\textwidth]{imagenes/identificacion-del-carrito.eps}
         \caption{Comparación entre la posición medida del carrito y la estimada por el modelo a partir del ángulo registrado. Ambas posiciones utilizan la referencia $y=d-15.612\,\text{cm}$.}
@@ -599,7 +597,7 @@
     \subsubsection{Comparación de la respuesta de la planta completa con y sin retardo}
     Para completar el análisis se comparó la respuesta de la planta completa considerando los casos en que la transferencia servomotor-barra posee retardo y en el que no, comparando ambas respuestas con la respuesta medida.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         \includegraphics[width=0.95\textwidth]{imagenes/comparacion_planta_completa.eps}
@@ -635,7 +633,7 @@
 
     El margen de retardo obtenido fue de $11.4\,\text{s}$: representa el retardo puro adicional que llevaría al lazo al límite de estabilidad, manteniendo la ganancia considerada. Estos resultados muestran márgenes amplios, aunque con una frecuencia de cruce de ganancia baja, lo que motiva aumentar la ganancia para obtener una respuesta más rápida.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         \includegraphics[width=1\textwidth]{imagenes/bode-planta-total.eps}
@@ -656,7 +654,7 @@
 
     Al evaluar el lazo abierto compensado $L_P(s)=K_pG_P(s)$, se obtuvo una frecuencia de cruce de ganancia de $2.54\,\text{rad/s}$, con un margen de fase de $62\degree$ y un margen de ganancia de $17.7\,\text{dB}$. La ganancia elegida aproxima el objetivo de diseño y conserva un margen de fase ligeramente superior a $60\degree$. Frente al caso de ganancia unitaria, aumenta la frecuencia de cruce a costa de reducir los márgenes de estabilidad.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         \includegraphics[width=0.95\textwidth]{imagenes/bode_con_P.eps}
@@ -707,7 +705,7 @@
     \subsubsection{Simulación digital del escalón de posición}
     Se simuló un escalón de $10\,\text{cm}$ aplicado en $t=2\,\text{s}$, partiendo del reposo y de posición cero. Se tomó el modelo nominal sin el sesgo de aceleración ($c=0$), incluyendo los límites y el redondeo del comando. Los resultados se resumen en la Tabla~\ref{tab:p_escalon_simulado}. El tiempo de establecimiento se mide desde la aplicación del escalón.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Respuesta simulada al escalón de $10\,\text{cm}$ con control proporcional digital, límites y redondeo del comando.}
         \label{tab:p_escalon_simulado}
@@ -728,7 +726,7 @@
 
     El error estacionario del modelo digital lineal nominal fue numéricamente $-5.107\times10^{-14}\,\text{cm}$, compatible con cero dentro de la precisión de cálculo. Esto es consistente con el polo en el origen de la planta: con realimentación unitaria estable, el modelo nominal con control P tiene error nulo ante una referencia escalón. El error medio de $-0.00183\,\text{cm}$ corresponde a una ventana final de la simulación con redondeo y no constituye una medición experimental. La fricción, un desajuste del equilibrio u otras perturbaciones pueden producir un error persistente en la planta real, por lo que este resultado se constrastará con el ensayo.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         \includegraphics[width=0.95\textwidth]{imagenes/escalon_10cm_P.eps}
@@ -741,7 +739,7 @@
 
     Con el mismo controlador digital y $c=0$, el máximo desplazamiento absoluto posterior al golpe fue de $0.54567\,\text{cm}$. El pulso del servo permaneció entre $1533$ y $1545\,\mu\text{s}$, sin muestras saturadas. Estos resultados describen la recuperación simulada para el salto de velocidad elegido.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         \includegraphics[width=0.95\textwidth]{imagenes/p_golpe_simulado.eps}
@@ -754,7 +752,7 @@
 
     La comparación se realizó con la simulación digital nominal, incluyendo el muestreo, los límites y el redondeo del comando, con $c=0$. La Tabla~\ref{tab:p_comparacion_escalon} resume los resultados posteriores al escalón. Se define el error como $e=r-y$ y se calcula su promedio sobre los últimos $2\,\text{s}$ de cada registro.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comparación de la respuesta real y simulada al escalón de $10\,\text{cm}$ con control P.}
         \label{tab:p_comparacion_escalon}
@@ -772,7 +770,7 @@
     \end{table}
 
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         % Imagen generada por el script: TP2/comparacion_escalon_P.png.
@@ -790,7 +788,7 @@
 
     La Tabla~\ref{tab:p_comparacion_golpe} resume la comparación ante el golpe. El registro real no permaneció dentro de la banda de $\pm0.2\,\text{cm}$ hasta el final del ensayo. No hubo muestras en los límites del comando ni saturaciones en la simulación.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comparación real y simulada ante un golpe con control P. El error final es el promedio de $r-y$ en los últimos $2\,\text{s}$.}
         \label{tab:p_comparacion_golpe}
@@ -808,7 +806,7 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la imagen y descomentar:
         \includegraphics[width=0.95\textwidth]{imagenes/comparacion_golpe_P.eps}
@@ -835,7 +833,7 @@
     \subsubsection{Márgenes de estabilidad y respuesta continua}
     Para el lazo abierto compensado $L_{PI}(s)=C_{PI}(s)G_P(s)$ se obtuvo un margen de fase de $53\degree$ a la frecuencia de cruce de ganancia $\omega_{gc}=1.65\,\text{rad/s}$, y un margen de ganancia de $23.7\,\text{dB}$ a la frecuencia de cruce de fase $\omega_{pc}=11.1\,\text{rad/s}$. Frente al P diseñado, disminuyen tanto la frecuencia de cruce como el margen de fase, mientras que aumenta el margen de ganancia.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la captura del Bode continuo del PI:
         \includegraphics[width=0.95\textwidth]{imagenes/bode_con_PI.eps}
@@ -871,7 +869,7 @@
     \subsubsection{Simulación digital del escalón de posición}
     Con el script \texttt{disenar\_control.m} se simuló un escalón de $0$ a $10\,\text{cm}$ en $t=2\,\text{s}$, partiendo del reposo y de posición cero, con $c=0$. La planta se discretizó con ZOH y el controlador con Tustin. Se incluyeron la saturación del pulso a $[1100,2000]\,\mu\text{s}$ y el redondeo a microsegundos enteros. La recurrencia utiliza la salida limitada, sin redondear, como memoria del controlador, de la misma manera que el programa de Arduino.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Respuesta simulada al escalón de $10\,\text{cm}$ con control PI digital, límites y redondeo.}
         \label{tab:pi_escalon_simulado}
@@ -890,7 +888,7 @@
 
     La respuesta digital conserva un comportamiento cercano al continuo: el establecimiento es de aproximadamente $5.17\,\text{s}$ y el sobrepaso es de $22.99\,\%$, sin alcanzar los límites del actuador. El error estacionario del modelo digital lineal fue numéricamente $1.3101\times10^{-13}\,\text{cm}$, compatible con cero. Como el modelo nominal con P ya tenía error nulo al escalón, esta simulación con $c=0$ no demuestra una mejora del error final por la integral. Su efecto sobre el desplazamiento persistente observado deberá evaluarse con el ensayo real.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por disenar_control.m: TP2/PI_escalon_simulado.png.
         % Reemplazar el recuadro y descomentar:
@@ -902,7 +900,7 @@
     \subsubsection{Simulación de una perturbación impulsiva}
     Como evaluación adicional, se mantuvo la referencia en cero y se introdujo un salto de velocidad de $5\,\text{cm/s}$ en $t=5\,\text{s}$, con las mismas condiciones nominales utilizadas para el P. El máximo desplazamiento absoluto posterior al golpe fue de $0.57505\,\text{cm}$. El comando permaneció entre $1536$ y $1545\,\mu\text{s}$, sin muestras saturadas. La amplitud del salto es ilustrativa y permite comparar ambos controladores bajo la misma perturbación simulada.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por disenar_control.m: TP2/PI_golpe_simulado.png.
         % Reemplazar el recuadro y descomentar:
@@ -914,7 +912,7 @@
     \subsubsection{Comparación experimental del escalón de posición}
     Se repitió el ensayo de referencia de $0$ a $10\,\text{cm}$ con el controlador PI implementado en su forma bilineal. El registro se procesó mediante el comparador generalizado \texttt{comparar\_escalon\_P.m}, utilizando $C_{PI}(s)$ de la ecuación~\ref{eq:pi_sintonia}. Se alinearon temporalmente las respuestas en el instante del escalón y se conservaron las posiciones medidas, expresadas respecto de la referencia experimental. No se detectaron muestras inválidas.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comparación real y simulada del escalón de $10\,\text{cm}$ con control PI. El error final es el promedio de $r-y$ en los últimos $2\,\text{s}$.}
         \label{tab:pi_comparacion_escalon}
@@ -931,7 +929,7 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por el comparador: TP2/comparacion_escalon_PI.png.
         % Reemplazar el recuadro y descomentar:
@@ -953,7 +951,7 @@
     \subsubsection{Comparación experimental ante un golpe}
     Se mantuvo la referencia en cero y se aplicó un ligero golpe al carrito con el controlador PI activo. El ensayo se procesó mediante \texttt{comparar\_golpe.m}, fijando el inicio de la perturbación en $t=2.771\,\text{s}$ del registro original. Para la comparación se utilizó un salto de velocidad simulado de $-5\,\text{cm/s}$, dirigido hacia el sensor, con el modelo nominal sin sesgo y el controlador discretizado mediante Tustin.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comparación real y simulada ante un golpe con control PI. La recuperación se evalúa respecto de la banda fija de $\pm0.2\,\text{cm}$ alrededor de la referencia nula.}
         \label{tab:pi_comparacion_golpe}
@@ -971,7 +969,7 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por comparar_golpe(..., 'PI', ...):
         % TP2/comparacion_golpe_PI.png. Reemplazar el recuadro y descomentar:
@@ -997,7 +995,7 @@
     \]
     El factor $10^{24/20}=15.848932$ corresponde a la ganancia de alta frecuencia de esta transferencia, mientras que su ganancia estática es $K_p$. El filtro limita la ganancia de la acción derivativa a altas frecuencias. Se evaluó esta sintonía buscando una respuesta amortiguada y comandos dentro del intervalo operativo. Los resultados siguientes verifican esa condición para los ensayos simulados, pero no demuestran que se haya alcanzado la mayor rapidez posible entre todas las sintonías admisibles. Inicialmente se evaluó una sintonía orientada a un margen de fase de $60\degree$, pero se descartó porque el comportamiento obtenido fue inestable. Por este motivo, no se mantuvo ese margen como objetivo y se adoptó la sintonía presentada.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Reemplazar el recuadro por la captura del Bode del PD:
         \includegraphics[width=0.95\textwidth]{imagenes/bode_control_pd.eps}
@@ -1026,7 +1024,7 @@
     \subsubsection{Simulación digital del escalón de posición}
     Se repitió la simulación del escalón de $0$ a $10\,\text{cm}$ en $t=2\,\text{s}$, partiendo del reposo y con $c=0$. Se utilizó la planta discretizada con ZOH y la recurrencia del controlador bilineal, incluyendo los límites y el redondeo del pulso como en el programa de Arduino.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Respuesta simulada al escalón de $10\,\text{cm}$ con control PD digital, límites y redondeo.}
         \label{tab:pd_escalon_simulado}
@@ -1047,7 +1045,7 @@
 
     El error estacionario del modelo digital lineal fue numéricamente $-1.9984\times10^{-14}\,\text{cm}$, compatible con cero. En cambio, la simulación con redondeo presentó un error medio final de $0.05819\,\text{cm}$. La cuantización del comando puede sostener pequeños errores: para este PD, con $K_p=7.924466\,\mu\text{s}/\text{cm}$, un error constante inferior a aproximadamente $0.5/K_p=0.0631\,\text{cm}$ puede generar una corrección que se redondea a cero microsegundos respecto del centro. El error obtenido es compatible con ese mecanismo y permanece dentro de la banda de $\pm0.2\,\text{cm}$.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por disenar_control.m: TP2/PD_escalon_simulado.png.
         % Reemplazar el recuadro y descomentar:
@@ -1059,7 +1057,7 @@
     \subsubsection{Simulación de una perturbación impulsiva}
     Con la referencia fija en cero se introdujo un salto de velocidad de $5\,\text{cm/s}$ en $t=5\,\text{s}$, manteniendo las condiciones nominales de los ensayos simulados anteriores. El máximo desplazamiento absoluto posterior al golpe fue de $0.57390\,\text{cm}$. El pulso permaneció entre $1538$ y $1544\,\mu\text{s}$, sin muestras saturadas. La amplitud del salto es ilustrativa y no constituye una medición del impulso real.
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por disenar_control.m: TP2/PD_golpe_simulado.png.
         % Reemplazar el recuadro y descomentar:
@@ -1071,7 +1069,7 @@
     \subsubsection{Comparación experimental del escalón de posición}
     Se aplicó el escalón de referencia de $0$ a $10\,\text{cm}$ a la planta real con el PD filtrado implementado mediante Tustin. Se utilizó el comparador generalizado \texttt{comparar\_escalon.m}, alineando el instante del escalón y conservando las posiciones medidas sin desplazamientos adicionales. No se detectaron muestras inválidas.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comparación real y simulada del escalón de $10\,\text{cm}$ con control PD. El error final es el promedio de $r-y$ en los últimos $2\,\text{s}$.}
         \label{tab:pd_comparacion_escalon}
@@ -1088,7 +1086,7 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por el comparador: TP2/comparacion_escalon_PD.png.
         % Reemplazar el recuadro y descomentar:
@@ -1106,7 +1104,7 @@
     \subsubsection{Comparación experimental ante un golpe}
     Con la referencia fija en cero se aplicó un ligero golpe al carrito y se comparó el registro con la simulación del PD mediante \texttt{comparar\_golpe.m}. Se fijó el inicio de la perturbación en $t=7.895\,\text{s}$ del registro original. Se utilizó un salto de velocidad simulado de $-5\,\text{cm/s}$, dirigido hacia el sensor. La mediana de posición real del primer segundo fue de $-0.3151\,\text{cm}$ y se conservó sin corregir las curvas, mientras que la simulación partió de posición cero. La intensidad del impulso real no fue medida, por lo que la comparación de amplitudes es cualitativa.
 
-    \begin{table}[!htbp]
+    \begin{table}[H]
         \centering
         \caption{Comparación real y simulada ante un golpe con control PD. La recuperación se evalúa respecto de la banda fija de $\pm0.2\,\text{cm}$ alrededor de la referencia nula.}
         \label{tab:pd_comparacion_golpe}
@@ -1124,7 +1122,7 @@
         \end{tabular}
     \end{table}
 
-    \begin{figure}[!htbp]
+    \begin{figure}[H]
         \centering
         % Imagen generada por comparar_golpe(..., 'PD', ...):
         % TP2/comparacion_golpe_PD.png. Reemplazar el recuadro y descomentar:
