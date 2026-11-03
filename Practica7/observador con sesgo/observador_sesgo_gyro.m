@@ -13,11 +13,14 @@ C = [1 0 0; 0 1 1];
 
 % discretizo matrices continuas
 Ts = 0.02;
-Ad = eye(3) + Ac*Ts;
-Bd = Bc*Ts;
-Cd = C;
+%Ad = eye(3) + Ac*Ts;
+%Bd = Bc*Ts;
+%Cd = C;
 
-p_obs = [3*real(p_cont(1)), 3*real(p_cont(2)), -5];
+sysd = c2d(ss(Ac, Bc, C, 0), Ts, 'zoh');
+Ad = sysd.A;  Bd = sysd.B;  Cd = C;
+
+p_obs = [2*p_cont(1), 2*p_cont(2), -5];
 p_obs_disc = exp(Ts*p_obs);
 
 Ld = (place(Ad', Cd', p_obs_disc))';

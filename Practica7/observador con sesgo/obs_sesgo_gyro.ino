@@ -59,20 +59,44 @@ uint8_t indicePulso = 0;
 // defino las matrices del modelo en espacio de estados
 using namespace BLA;
 
-Matrix<3, 3> Ad = {1.0f, 0.02, 0.0f,
+/*Matrix<3, 3> Ad = {1.0f, 0.02, 0.0f,
                    -19.35, -0.0024, 0.0f,
+                   0.0f, 0.0f, 1.0f};*/
+
+Matrix<3, 3> Ad = {0.8619, 0.0118, 0.0f,
+                  -11.4588, 0.2683, 0.0f,
                    0.0f, 0.0f, 1.0f};
 
-Matrix<3, 1> Bd = {0.0f,
+
+/*Matrix<3, 1> Bd = {0.0f,
                    0.7364,
+                   0.0f};*/
+
+Matrix<3, 1> Bd = {0.0053,
+                   0.4361,
                    0.0f};
 
 Matrix<2, 3> Cd = {1.0f, 0.0f, 0.0f,
                    0.0f, 1.0f, 1.0f};
 
-Matrix<3, 2> L = {0.7773, 0.0181,
-                  -19.3464, -0.2033,
-                  0.0126, 0.0741};
+
+// polos 3 veces + rápidos
+/*Matrix<3, 2> L = {0.0961, -0.0140,
+                  -19.3661, -0.0501,
+                  -0.0319, 0.8473};
+
+// polos 4 veces + rápidos
+Matrix<3, 2> L = {1.0343, -0.2351,
+                  -19.2764, -0.0690,
+                  -0.0461, 0.1015};*/
+
+/*Matrix<3, 2> L = {0.8734, 0.0781,
+                  -11.7452, 0.1869,
+                  0.1355, 0.1391};*/
+
+Matrix<3, 2> L = {-0.0424, -0.0102,
+                  -11.4664, -0.0833,
+                  -0.0246, 0.8076};
 
 Matrix<3, 1> xk = {0, 0, 0};
 Matrix<3, 1> xk_ant = {0, 0, 0};
@@ -82,13 +106,13 @@ Matrix<2, 1> yk_ant = {0, 0};
 
 void sendBinaryFrame() {
   if ((int32_t)(proximaMuestraUs - micros()) < (int32_t)RESERVA_TX_US ||
-      Serial.availableForWrite() < 20) {
-    digitalWrite(LED_BUILTIN, HIGH);
+      Serial.availableForWrite() < 28) {
     return;
   }
-  uint8_t trama[20] = {'a', 'b', 'c', 'd'};
-  const float valores[] = {yk(0), xk(0), yk(1), xk(1), gyroX_offsetRadS*(180.0/PI), xk(2)};
-  for (uint8_t i = 0; i < 4; ++i) {
+  uint8_t trama[28] = {'a', 'b', 'c', 'd'};
+  //const float valores[] = {yk(0), xk(0), yk(1), xk(1), gyroX_offsetRadS*(180.0/PI), xk(2)};
+  const float valores[] = {yk(0), xk(0), yk(1), xk(1), 10, xk(2)};
+  for (uint8_t i = 0; i < 6; ++i) {
     uint32_t bits;
     memcpy(&bits, &valores[i], sizeof(bits));
     for (uint8_t j = 0; j < 4; ++j)
@@ -139,23 +163,27 @@ void loop() {
     proximaMuestraUs += SAMPLE_PERIOD_US;
   }
 
-  static float dt = (ahoraUs - tiempoAnteriorUs) * 1.0e-6;
+  const float dt = (ahoraUs - tiempoAnteriorUs) * 1.0e-6;
   tiempoAnteriorUs = ahoraUs;
   
   sensors_event_t accel, gyro, temperatura;
   mpu.getEvent(&accel, &gyro, &temperatura);
 
-  anguloAccX =
+  /*anguloAccX =
       atan2(accel.acceleration.y,
             sqrt(sq(accel.acceleration.x) + sq(accel.acceleration.z))) *
-      180.0 / PI;
-  static float velAngularGyro = gyro.gyro.x * 180.0/PI;
-  anguloGyroX = yk(0) + velAngularGyro*dt;
+      180.0 / PI;*/
+
+  const float velAngularGyro = gyro.gyro.x * (180.0/PI) + 10;   // agrego un sesgo artificial de 10°/s
+  anguloAccX = atan2(accel.acceleration.y, accel.acceleration.z) * 180.0 / PI - offsetAnguloX;
+  //anguloGyroX = anguloFiltradoX + (velAngularGyro - gyroX_offsetRadS * (180.0/PI))*dt;
+  anguloGyroX = anguloFiltradoX + (velAngularGyro - 10)*dt;
 
   anguloFiltradoX = ALPHA * anguloGyroX + (1-ALPHA) * anguloAccX;
 
   yk_ant = yk;
-  yk(0) = anguloFiltradoX - offsetAnguloX;
+  //yk(0) = anguloFiltradoX - offsetAnguloX;
+  yk(0) = anguloFiltradoX;
   yk(1) = velAngularGyro;
 
   xk_ant = xk;
@@ -172,7 +200,8 @@ void loop() {
   comandoServoUs = (float)SECUENCIA_SERVO_US[indicePulso];
   miServo.writeMicroseconds((int)comandoServoUs);
   
-  u = mapear_us_a_angulo(comandoServoUs);
+  //u = mapear_us_a_angulo(comandoServoUs);
+  u = comandoServoUs - PULSO_CENTRO_US;
 
   sendBinaryFrame();
 
@@ -195,13 +224,13 @@ void calibrarCeroAngular() {
 }
 
 void calibrarGyro() {
-  float sumaXRadS = 0.0;
+  float sumaXRadS = 0.0;  
   const int muestras = 500;
 
   for (int i = 0; i < muestras; i++) {
     sensors_event_t accel, gyro, temperatura;
     mpu.getEvent(&accel, &gyro, &temperatura);
-    sumaXRadS += gyro.gyro.x;
+    sumaXRadS += gyro.gyro.x + 10*(PI/180.0); // agrego sesgo artificial de 10°/s
     delay(3);
   }
 
