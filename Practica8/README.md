@@ -1,10 +1,14 @@
 # Control de angulo por estados a 50 Hz
 
-1. Ejecutar `controlador_variable_estados.m` para obtener K y H.
+1. Ejecutar `controlador_variable_estados.m` para obtener `K_ref`, `Fr`, `K_int` y `H`.
+   El script imprime las seis constantes para Arduino sin sobrescribir ganancias.
 2. Abrir `control_servo_barra/control_servo_barra.ino` en Arduino IDE.
-3. Configurar `K_THETA = K(1)`, `K_OMEGA = K(2)`, `H_INTEGRAL = H` y
-   `REFERENCIA_GRADOS`. Las ganancias incluidas corresponden a polos
-   [-20 -30 -0.5], con estados en radianes y entrada relativa en microsegundos.
+3. Elegir `MODO_CONTROL = REFERENCIA_FR` (inicial) o `MODO_CONTROL = INTEGRAL`.
+   Copiar las constantes impresas por MATLAB y configurar `REFERENCIA_GRADOS`.
+   Fr usa polos [-20 -30]; integral usa [-20 -30 -4]. Estados en radianes,
+   entrada relativa en microsegundos. Se disena en continuo y se ejecuta a 50 Hz;
+   verificar la respuesta muestreada en el equipo.
+   Cambiar el modo requiere recompilar y cargar; el reinicio pone q en cero.
 4. Confirmar centro (1544 us), limites (1100 a 2000 us), eje y pin del servo.
    Librerias: Servo, Adafruit MPU6050 y Adafruit Unified Sensor; Wire del core.
 5. Cargar el sketch. Mantener inmovil durante calibracion (aprox. 8 s).
@@ -23,9 +27,17 @@ se convierte a radianes. Omega medida es el giroscopio corregido por bias.
 Se reutiliza una copia exacta del encabezado Tustin de Practica7, no otra L.
 Si se regenera ese encabezado, copiarlo de nuevo a esta carpeta del sketch.
 
-Cada 20 ms: medir, observar, calcular `u = -K*xhat + H*q`, saturar y redondear
-el pulso, actualizar `q += 0.02*(referencia-theta_medida)` y las memorias.
-La integracion se congela cuando aumentaria una saturacion existente.
+Cada 20 ms: medir, observar, calcular la orden segun el modo, saturar y redondear
+el pulso y actualizar las memorias. El observador recibe la entrada total aplicada,
+luego de saturacion y redondeo, relativa al centro.
+
+- `REFERENCIA_FR`: `u = -K_ref*xhat + Fr*referencia`. El integrador queda en cero.
+  Fr da ganancia estatica unitaria para referencias constantes en el modelo nominal;
+  por si solo no corrige perturbaciones constantes ni errores de modelo.
+- `INTEGRAL`: `u = -K_int*xhat + H*q`. Actualizar
+  `q += 0.02*(referencia-theta_medida)`; congelar si agrava la saturacion.
+  No se suma Fr en este modo.
+
 El observador conserva u[k-2]+u[k-3]: supone un retardo externo de 40 ms,
 heredado de Practica7, cuya correspondencia con la planta sigue pendiente.
 No se agrega un buffer que retrase la orden fisica al servo.
@@ -33,7 +45,7 @@ No se agrega un buffer que retrase la orden fisica al servo.
 ## Telemetria y plazos
 
 Una trama binaria de 20 bytes por ciclo, a 115200 baudios (1000 bytes/s), compatible con Practica7.
-Cabecera `abcd`, seguida de cuatro float32 little endian: omega estimada (rad/s), omega medida (rad/s), theta estimada (rad), theta medida (rad).
+Cabecera `abcd`, seguida de cuatro float32 little endian: omega estimada (rad/s), omega medida (rad/s), theta estimada (grados), theta medida (grados).
 No enviar texto por este puerto. No se transmiten referencia, pulso, secuencia, tiempo ni bits de fallo.
 La transmision UART es asincrona; no se promete latencia constante en USB/PC.
 

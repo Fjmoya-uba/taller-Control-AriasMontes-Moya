@@ -1,0 +1,435 @@
+\documentclass[a4paper, twoside, 10pt, spanish]{article}
+
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage[margin=.95in]{geometry}
+\usepackage{array}
+\usepackage{pdflscape}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{xcolor}
+  
+% Definición del tamaño de página y los márgenes:
+% Si preferís menos márgenes, descomentá la línea siguiente
+%\usepackage[a4paper,headheight=16pt,scale={0.7,0.8},hoffset=0 5cm]{geometry}
+\usepackage[demo]{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[utf8x]{inputenc}
+\usepackage[spanish]{babel}
+  \usepackage[per-mode=fraction]{siunitx}
+  \sisetup
+  {
+      output-decimal-marker = {.},
+      exponent-product = \cdot,
+          group-digits = integer,
+      group-separator = {,}
+  }
+  %
+  % El paquete amsmath agrega algunas funcionalidades extra alas fórmulas.
+  % Además defino la numeración de las tablas y figuras alestilo "Figura 2.3",
+  % en lugar de "Figura 7". (Por lo tanto, aunque no usesfórmulas, si querés
+  % este tipo de numeración dejá el paquete amsmathdescomentado).
+  %
+    \usepackage{amsmath, amsfonts, amssymb}
+    \usepackage{yhmath}
+    %\numberwithin{equation}{section}
+    %\numberwithin{figure}{section}
+    \numberwithin{table}{section}
+    % ENCABEZADO y PIE DE PÁGINA
+
+    \usepackage{fancyhdr}   % Para poder personalizarlo
+    \usepackage{lastpage}   % Para poder saber cuántas páginas tiene el documento
+    \pagestyle{fancy}
+    \renewcommand{\sectionmark}[1]{\markboth{}{\thesection\ \ #1}}
+    \fancyhead{}	% Elimino el contenido del encabezado
+    % Muestra la sección a la derecha (izquierda) en páginas impares (pares)
+    \fancyhead[RO,LE]{\rightmark}
+    % El siguiente texto a la derecha (izquierda) en páginas pares (impares)
+
+    \fancyfoot{}	% Elimino el contenido del pie de página
+    % A la izquierda (derecha) en páginas pares (impares): nro. de página / total
+    \fancyfoot[LE,RO]{\thepage/\pageref{LastPage}}
+    % Hipervínculos (enlaces) en el documento (y modificación de atributos)
+    \usepackage{url}
+    \urlstyle{tt}
+    \usepackage[colorlinks=true,linkcolor=black, urlcolor=blue]{hyperref}
+    \hypersetup{
+        breaklinks,
+        baseurl       = http://,
+        pdfborder     = 0 0 0,
+        pdfpagemode   = UseNone,
+        pdfstartpage  = 1,
+        pdfcreator    = {Plantilla de informe de TP para \LaTeX{}},
+        bookmarksopen = true,
+        bookmarksdepth= 2,% to show sections and subsections
+        pdfauthor     = {Apellido~1, Apellido~2, Apellido~3},
+        pdftitle      = {-},
+        pdfsubject    = {Informe},
+        pdfkeywords   = {}%
+        }
+
+    % ==== Paquetes para TikZ ====
+    \usepackage{tikz}
+    \usetikzlibrary{arrows.meta, positioning, shapes, calc}
+
+    \usepackage{enumerate}
+    \usepackage{booktabs}
+    \usepackage{multirow}
+    \usepackage{pgfplots}
+    \pgfplotsset{compat=1.18}
+    \usepackage{graphicx}
+    \pdfcompresslevel=9
+
+    % Todas las imágenes están en el directorio imgs:
+    \newcommand{\imgdir}{img}
+    \graphicspath{{\imgdir/}}
+    % El paquete recomendado actualmente es minted.
+    % Documentación: https://www.ctan.org/pkg/minted
+    \usepackage[
+            section,    % Numera el código según la sección
+        ]{minted}
+    % minted provee los comandos:
+
+    % 1)  \mint[<opciones>]{<lenguaje>}<delimitador><código><delimitador>
+    % 2)  \mintinline[<opciones>]{<lenguaje>}<delimitador><código><delimitador>
+    % 3)  \inputminted[<opciones>]{<lenguaje>}{<archivo>}
+    \setminted[c]{
+    %        style=,
+            linenos,            % Mostrar los números de línea
+            numberfirstline,    % Numerar SIEMPRE la primera línea mostrada
+            tabsize=4,          % Reemplazar las tabulaciones por 4 espacios
+            autogobble          % Eliminar espacio sobrante al comienzo
+        }
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % COMANDOS UTILES
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % los siguientes comandos permiten escribir de manera uniforme en todo el
+    % documento
+
+    % Para poder manejar los espacios al final de los comandos propios
+    \usepackage{xspace}
+
+    \usepackage{algorithm}
+    \usepackage{algpseudocode}
+
+    % Abreviatura de 'número' utilizando letras voladas (correcto español)
+    \newcommand{\Nro}{N.\textsuperscript{o}\xspace}
+    \newcommand{\nro}{n.\textsuperscript{o}\xspace}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % PAQUETES EXTRAS
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \usepackage{circuitikz}
+    \usepackage{listings}
+    \usepackage{xcolor}
+
+    % --- Configuración para mostrar código Python ---
+    \lstdefinestyle{pythonstyle}{
+        language=Python,
+        basicstyle=\ttfamily\small,
+        backgroundcolor=\color{gray!5},
+        frame=single,
+        framerule=0.3pt,
+        rulecolor=\color{gray!50},
+        keywordstyle=\color{blue!70!black},
+        stringstyle=\color{orange!70!black},
+        commentstyle=\color{gray!70!black}\itshape,
+        showstringspaces=false,
+        breaklines=true,
+        tabsize=4,
+        captionpos=b,
+    }
+    \lstset{style=pythonstyle}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % COMANDOS UTILES
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % los siguientes comandos permiten escribir de manera uniforme en todo el
+    % documento
+
+    % Para poder manejar los espacios al final de los comandos propios
+    \usepackage{xspace}
+
+    \usepackage{algorithm}
+    \usepackage{algpseudocode}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % PAQUETES EXTRAS
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \usepackage{circuitikz}
+    \usepackage{float}
+    \usepackage{multicol}
+    \usepackage{gensymb}
+    \usepackage{gensymb}
+
+
+    % NO cargues otra vez \usepackage{biblatex}
+    % NO uses 2 \addbibresource distintos salvo que realmente quieras 2 bases
+    \usepackage[backend=biber,
+    style=numeric-comp,
+    sorting=none,
+    language=spanish,
+    doi=false,
+    isbn=false,
+    url=true,
+    eprint=false
+    ]{biblatex}
+
+    \addbibresource{referencias.bib}
+    \usepackage{enumitem}
+
+    % INICIO DEL DOCUMENTO
+
+    \begin{document}
+
+    \begin{titlepage}
+    \centering
+
+    \includegraphics[width=0.2\textwidth]{imagenes/fiuba.pdf}\par\vspace{1cm}
+
+    {\scshape\LARGE Universidad de Buenos Aires \par}
+    \vspace{0.2cm}
+    {\scshape\Large Facultad de Ingeniería \par}
+    \vspace{0.2cm}
+    {\large 2° cuatrimestre 2026 \par}
+
+    \vspace{2cm}
+
+    {\Large \textbf{Taller de Automatización y Control}\par}
+
+    \vspace{1cm}
+
+    {\large \textbf{Trabajo Práctico N°3: Control Digital Avanzado}\par}
+
+    \vspace{2cm}
+
+    % Tabla de integrantes
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|m{6cm}|m{2cm}|m{5cm}|}
+    \hline
+    \multicolumn{3}{|c|}{\textbf{Integrantes Grupo N° 1}} \\
+    \hline
+    \textbf{Nombre y apellido} & \textbf{Padrón} & \textbf{Correo} \\
+    \hline
+    Fransisco Javier Moya & 109899 & fjmoya@fi.uba.ar \\
+    \hline
+    Lucas Fabrizio Arias Montes & 110876 & lfarias@fi.uba.ar \\
+    \hline
+    \end{tabular}
+
+    \vfill
+
+    \end{titlepage}
+
+    \setcounter{page}{1}
+    \tableofcontents
+    \newpage
+
+    \section{Introducción}
+
+
+\section{Antecedentes: observador del sistema servomotor--barra}
+\label{sec:observador-servo-barra}
+
+Como antecedente para el observador de la planta completa, se considera el observador de dos estados desarrollado en la práctica 7 y reutilizado en la práctica 8. Su objetivo es estimar el ángulo y la velocidad angular de la barra a partir del comando aplicado al servomotor y del ángulo medido. Esta experiencia sirve como punto de partida; la incorporación del carrito requiere ampliar el modelo y revisar el diseño del observador.
+
+\subsection{Modelo y desacoplamiento del retardo de transporte}
+La identificación de la dinámica servomotor-barra a partir de ensayos escalón e impulso se formuló mediante regresión lineal discreta considerando un retardo puro de transporte:
+\begin{equation}
+\Delta y_k = a_1\Delta y_{k-1} + a_2\Delta y_{k-2} + b\,\Delta u_{k-1}.
+\end{equation}
+Dicha ecuación en diferencias representa en el dominio $\mathcal{Z}$ una función de transferencia de la forma
+\begin{equation}
+G_z(z) = \frac{b\,z^{-1}}{1 - a_1 z^{-1} - a_2 z^{-2}} = \frac{b}{z^2 - a_1 z - a_2} \cdot z^{-1}.
+\end{equation}
+Para el diseño del observador se desacopla deliberadamente el retardo de muestreo ($z^{-1}$) de la dinámica intrínseca de la planta. Modelar retardos en tiempo continuo suele requerir aproximaciones racionales (como aproximantes de Padé), las cuales incrementan el orden del sistema agregando ceros de fase no mínima y estados matemáticos artificiales carentes de significado físico medible. 
+
+Al aislar el retardo, se mapean únicamente los polos discretos a continuo ($p_i = -\frac{1}{T_s}\ln z_i$), obteniendo una planta continua de segundo orden estricto que describe fielmente la masa, inercia y amortiguamiento del conjunto mecánico. Con el vector de estados físicos $x = [\theta \quad \omega]^T$ (donde $\omega = \dot\theta$) y la entrada $u$ expresada como variación del ancho del pulso respecto del centro calibrado, se obtiene:
+\begin{equation}
+\dot x = Ax + Bu, \qquad y = Cx,
+\end{equation}
+con matrices numéricas:
+\begin{equation}
+A = \begin{bmatrix} 0 & 1 \\ -967.5 & -50.12 \end{bmatrix}, \quad
+B = \begin{bmatrix} 0 \\ 36.82\frac{\pi}{180} \end{bmatrix}, \quad
+C = \begin{bmatrix} 1 & 0 \end{bmatrix}.
+\end{equation}
+
+El observador continuo de Luenberger se define entonces sobre este espacio físico de orden dos:
+\begin{equation}
+\dot{\hat x} = A\hat x + Bu + L(y - C\hat x).
+\end{equation}
+El modelo predice la evolución de los estados y la diferencia entre el ángulo medido y el estimado corrige ambas estimaciones. El ángulo utilizado proviene del filtro complementario de la IMU. La velocidad angular del giroscopio se utiliza como señal de comparación externa; no constituye una entrada directa de medición al observador. La ganancia $L$ se obtiene por asignación de polos mediante \texttt{acker} aplicado al sistema dual.
+
+\subsection{Selección de polos y ajuste experimental}
+Inicialmente se ensayaron polos reales con una rapidez de convergencia del orden de dos o tres veces la dinámica de la planta. Este criterio se tomó como punto de partida, pero no produjo un comportamiento satisfactorio en los ensayos. Luego se probaron distintas ubicaciones hasta obtener una estimación adecuada en la implementación experimental. La selección final fue el resultado de un ajuste empírico y no de una optimización analítica formal.
+
+El exportador expresa los polos continuos seleccionados como
+\begin{align}
+\omega_b &= 2\max_i |\operatorname{Re}(p_{\mathrm{planta},i})|, \\
+p_{\mathrm{obs},1,2} &= -\zeta\omega_b \pm j\,1.25\,\omega_b\sqrt{1-\zeta^2}, \qquad \zeta=0.58.
+\end{align}
+Para el modelo corregido, los polos de la planta se ubican en $-25.06 \pm j18.40$ y los del observador en $-29.07 \pm j51.03$. El factor dos en $\omega_b$ no duplica la rapidez de decaimiento: esta depende exclusivamente de la parte real, cuya magnitud aumenta aproximadamente un $16\,\%$. Además, el factor multiplicador $1.25$ sobre la parte imaginaria reduce el amortiguamiento efectivo del par a $\zeta_{\mathrm{eff}} \approx 0.50$.
+
+El compromiso físico que explica este comportamiento radica en la relación entre velocidad de convergencia y sensibilidad al ruido de sensado. Si se contempla ruido de medición $n$ en la IMU, la dinámica del error $e = x - \hat x$ queda gobernada por:
+\begin{equation}
+\dot e = (A - LC)e - Ln.
+\end{equation}
+Incrementar indiscriminadamente la rapidez de los polos eleva los elementos de la ganancia $L$, inyectando ruido de alta frecuencia en la estimación del ángulo y, de forma crítica, degradando la estimación de la velocidad angular. Los polos complejos adoptados lograron un compromiso adecuado entre atenuación de ruido y rapidez de seguimiento.
+
+\subsection{Discretización por Tustin y compensación del retardo}
+Para trasladar el observador al microcontrolador conservando la parametrización en coordenadas físicas, se aplica la integración trapezoidal (aproximación bilineal de Tustin) sobre la ecuación diferencial del observador $\dot{\hat x} = (A - LC)\hat x + Bu + Ly$:
+\begin{equation}
+\hat x_k - \hat x_{k-1} = \frac{T_s}{2}\Big( (A - LC)(\hat x_k + \hat x_{k-1}) + B(u_{\mathrm{apl},k} + u_{\mathrm{apl},k-1}) + L(y_k + y_{k-1}) \Big).
+\end{equation}
+Definiendo $F = A - LC$, $h = T_s/2$ y $M = I - hF$, el despeje explícito de $\hat x_k$ conduce a:
+\begin{equation}
+A_d = M^{-1}(I + hF), \qquad B_u = M^{-1}hB, \qquad B_y = M^{-1}hL.
+\end{equation}
+Esta formulación evita transformaciones de similitud de estados y mantiene la dimensionalidad $2 \times 2$.
+
+El retardo temporal puro que fue desacoplado en la etapa de modelado se compensa de forma exacta en el entorno discreto dentro del microcontrolador. Debido a la latencia acumulada (el retardo de respuesta del actuador caracterizado en la regresión junto con el ciclo de cálculo y refresco del pulso PWM), la planta responde con un retraso efectivo de dos períodos de muestreo ($2T_s = 40\,\mathrm{ms}$). En consecuencia, la entrada que excita la dinámica en los extremos del intervalo de integración no es el comando actual $u_k$, sino el historial de acciones pasadas:
+\begin{equation}
+u_{\mathrm{apl},k} = u_{k-2}, \qquad u_{\mathrm{apl},k-1} = u_{k-3}.
+\end{equation}
+Sustituyendo estas muestras retrasadas, la ley de recurrencia ejecutada ciclo a ciclo en el firmware de Arduino resulta:
+\begin{equation}
+\hat x_k = A_d \hat x_{k-1} + B_u (u_{k-2} + u_{k-3}) + B_y (y_k + y_{k-1}).
+\end{equation}
+De este modo, se garantiza que la corrección $y_k$ coincida temporalmente con las entradas de control que causaron dicha respuesta física, sin sobrecargar computacionalmente al procesador con variables de estado ficticias. 
+
+Los polos continuos se mapean al plano $z$ mediante
+\begin{equation}
+z_i = \frac{1 + h\,p_{\mathrm{obs},i}}{1 - h\,p_{\mathrm{obs},i}},
+\end{equation}
+verificando el script exportador que $|z_i| < 1$.
+
+En la práctica 8 se reutiliza esta estructura para realimentar el estado hacia el controlador. La señal informada al observador corresponde al valor de $u$ efectivamente inyectado al motor (luego de aplicar las funciones de saturación y cuantización del pulso relativas al centro calibrado).
+% Pendiente: incorporar gráficos comparativos de los ensayos y revisar la
+% selección de polos al ampliar el observador a la planta con carrito.
+
+\section{Regulación del sistema completo sin referencia}
+\label{sec:regulacion-sin-referencia}
+
+\subsection{Diseño e implementación del regulador}
+Se considera el estado completo $x = [\theta\;\omega\;p\;v]^T$, donde el ángulo y la velocidad angular se expresan en radianes y radianes por segundo, y la posición y velocidad del carrito en centímetros y centímetros por segundo. La posición se mide respecto del centro elegido. Se implementa la ley
+\begin{equation}
+    u_k = -K\hat{x}_k,
+\end{equation}
+con $u$ expresado como variación del ancho de pulso respecto del equilibrio de $1544\,\mu\mathrm{s}$. Se emplea el observador completo previamente implementado, con período de muestreo $T_s = 20\,\mathrm{ms}$ y compensación del retardo de planta de dos muestras. El observador recibe el comando efectivamente aplicado, luego de la saturación y el redondeo. En esta etapa no se incorpora referencia ni acción integral.
+
+La primera selección de polos continuos fue $\{-1,-1.5,-20,-25\}\,\mathrm{s}^{-1}$. En el ensayo inicial, luego de desplazar manualmente el carrito, se observaron posiciones alejadas del origen que persistían sin retorno. Por ejemplo, entre aproximadamente $32$ y $43\,\mathrm{s}$ el carrito permaneció cerca de $+15\,\mathrm{cm}$, con una acción de control de unos $-38\,\mu\mathrm{s}$. Según la observación experimental del equipo, se requieren variaciones de pulso del orden de $50$ a $60\,\mu\mathrm{s}$ para iniciar el movimiento. El resultado es compatible con una acción insuficiente para vencer el rozamiento estático, fenómeno no representado en el modelo lineal nominal.
+
+Para aumentar la rapidez de corrección se reubicaron los polos en
+\begin{equation}
+    p_{\mathrm{control}} = \{-4,-8,-20,-25\}\,\mathrm{s}^{-1},
+\end{equation}
+mediante \texttt{place(A,B,polos\_controlador)}. La ganancia resultante, respetando el orden y las unidades anteriores, es
+\begin{equation}
+    K = \begin{bmatrix}
+    -110.6580 & 5.6202 & 32.2181 & 9.0821
+    \end{bmatrix}.
+\end{equation}
+En particular, la ganancia de posición aumenta de aproximadamente $1.51$ a $32.22\,\mu\mathrm{s}/\mathrm{cm}$. El cambio modifica las cuatro ganancias conjuntamente; la mejora no se atribuye únicamente al término de posición.
+
+\subsection{Respuesta experimental ante perturbaciones}
+El registro \texttt{controlador\_sin\_referencia\_ensayo\_02.mat} contiene aproximadamente $34\,\mathrm{s}$ de ensayo con desplazamientos manuales del carrito en ambos sentidos. Se observan excursiones de posición entre aproximadamente $-11$ y $+12\,\mathrm{cm}$, seguidas por retornos hacia el origen y respuestas amortiguadas, sin crecimiento sostenido de las oscilaciones en el registro. A diferencia del ensayo inicial, el carrito no permanece detenido lejos del centro. En los últimos dos segundos, la posición media medida es de aproximadamente $-0.36\,\mathrm{cm}$.
+
+Las estimaciones acompañan las mediciones durante las perturbaciones. El error cuadrático medio entre ángulo medido y estimado es de aproximadamente $0.14^\circ$, y entre posición medida y estimada de $1.15\,\mathrm{cm}$, considerando todo el registro. La velocidad estimada presenta menor ruido que la obtenida por diferencias de posición sobre una ventana de $100\,\mathrm{ms}$; esta última es una comparación aproximada y retardada, por lo que no constituye una medición independiente para validar exactamente la velocidad estimada.
+
+El comando aplicado coincide con el pedido dentro de la cuantización del pulso. Sus extremos son aproximadamente $-439$ y $+402\,\mu\mathrm{s}$ respecto del equilibrio: no se alcanza la saturación configurada de $[-444,456]\,\mu\mathrm{s}$, aunque se aproxima al límite inferior. Esto deja un margen reducido ante perturbaciones mayores.
+
+\begin{figure}[htbp]
+    \centering
+    % Pendiente: reemplazar el recuadro por la figura definitiva del ensayo 02.
+    % \includegraphics[width=\textwidth]{imagenes/controlador_sin_referencia_ensayo_02.png}
+    \fbox{\parbox[c][8cm][c]{0.92\textwidth}{\centering
+        Espacio reservado para las respuestas del ensayo 02.\\[0.5em]
+        Ángulo, velocidad angular, posición y velocidad: medidos y estimados.\\[0.5em]
+        Comando pedido y aplicado en función del tiempo.}}
+    \caption{Regulación sin referencia ante perturbaciones manuales en ambos sentidos, con polos $\{-4,-8,-20,-25\}\,\mathrm{s}^{-1}$. Figura pendiente de incorporación.}
+    \label{fig:regulacion-sin-referencia-ensayo02}
+\end{figure}
+
+Estos resultados constituyen una validación experimental inicial del regulador y del uso del observador en esta condición de funcionamiento. Para cuantificar tiempos de establecimiento y sobrepasos se prevé realizar un ensayo con perturbaciones aisladas y suficiente separación temporal. Se conserva esta configuración como base para la siguiente etapa de seguimiento de referencia; el ensayo presentado valida regulación alrededor del origen, sin evaluar todavía seguimiento.
+
+\section{Después vemos qué hacemos con esto.}
+
+\subsection{Estructura del Regulador y Asignación de Polos}
+A partir del modelo de estados de la planta servomotor--barra de segundo orden ($\dot{x} = A x + B u$, con $x = [\theta \quad \omega]^T$), se plantea una ley de control por realimentación de estados utilizando las estimaciones proporcionadas por el observador ($\hat{x}$):
+\begin{equation}
+u = -K \hat{x} = -k_\theta \hat{\theta} - k_\omega \hat{\omega}
+\end{equation}
+Al sustituir la ley de control en la dinámica de la planta, se obtiene la matriz de lazo cerrado $A_{\text{cl}} = A - B K$. Mediante la selección de las ganancias $K$ por asignación de autovalores, se modifican los coeficientes de rigidez y amortiguamiento propios del sistema físico, fijando la dinámica transitoria deseada.
+
+\subsection{Limitaciones del Seguimiento por Prealimentación ($F$)}
+Para lograr el seguimiento de una referencia angular $r$, se añade una ganancia de escala de entrada $F$, resultando en la ley $u = -K \hat{x} + F r$. En régimen permanente ($\dot{x} = 0$), el valor nominal de $F$ para obtener ganancia unitaria se calcula mediante:
+\begin{equation}
+F = \left( -C (A - B K)^{-1} B \right)^{-1}
+\end{equation}
+Esta estrategia opera en lazo abierto respecto al error persistente de la planta real. Como las variables de estado instantáneas ($\theta$ y $\omega$) no poseen memoria del tiempo transcurrido, si el servomotor se detiene antes de alcanzar la posición deseada debido a fricción estática (\textit{stiction}) o desajustes de modelo, la velocidad angular se anula ($\omega = 0$). Al ser la velocidad nula y el ángulo constante, la orden $u$ se estanca en un valor fijo e insuficiente para vencer el rozamiento, generando un error permanente en estado estacionario.
+
+\subsection{Ampliación del Espacio de Estados con Acción Integral}
+Con el objetivo de garantizar error nulo en estado estacionario ante perturbaciones o discrepancias de modelado, se expande el espacio de estados integrando la dinámica del error de seguimiento $e(t) = r(t) - y(t)$:
+\begin{equation}
+q(t) = \int_{0}^{t} (r(\tau) - y(\tau)) \, d\tau \implies \dot{q}(t) = r(t) - C x(t)
+\end{equation}
+Definiendo el vector de estados ampliado $x_{\text{amp}}(t) = [\theta(t) \quad \omega(t) \quad q(t)]^T$, la representación del sistema de orden $3 \times 3$ resulta:
+\begin{equation}
+\begin{bmatrix} \dot{x}(t) \\ \dot{q}(t) \end{bmatrix} = \begin{bmatrix} A & \mathbf{0} \\ -C & 0 \end{bmatrix} \begin{bmatrix} x(t) \\ q(t) \end{bmatrix} + \begin{bmatrix} B \\ 0 \end{bmatrix} u(t) + \begin{bmatrix} \mathbf{0} \\ 1 \end{bmatrix} r(t)
+\end{equation}
+La ley de control ampliada adopta la forma $u(t) = -K \hat{x}(t) + H q(t)$, donde $H$ representa la ganancia asociada al estado acumulador. De esta manera, mientras persista cualquier diferencia entre la referencia y la salida real ($r \neq y$), el estado $q(t)$ incrementa continuamente su valor, aumentando la acción de control ejercida sobre el servomotor hasta vencer la resistencia mecánica y anular por completo el error residual.
+
+\subsection{Fundamentación Matemática de la Asignación de Polos (\texttt{place})}
+
+Para calcular analíticamente las ganancias de realimentación ampliada $K_{\text{amp}} = [k_\theta \quad k_\omega \quad -H]$, se considera el sistema linealizado continuo de la planta servomotor--barra de segundo orden ampliado con la dinámica del integrador del error:
+\begin{equation}
+\begin{bmatrix} \dot{\theta} \\ \ddot{\theta} \\ \dot{q} \end{bmatrix} = 
+\underbrace{\begin{bmatrix} 0 & 1 & 0 \\ -a_0 & -a_1 & 0 \\ -1 & 0 & 0 \end{bmatrix}}_{A_{\text{amp}}} 
+\begin{bmatrix} \theta \\ \dot{\theta} \\ q \end{bmatrix} + 
+\underbrace{\begin{bmatrix} 0 \\ b \\ 0 \end{bmatrix}}_{B_{\text{amp}}} u + 
+\begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} r
+\end{equation}
+donde $a_0 = 967.5$, $a_1 = 50.12$ y $b = 36.82 \frac{\pi}{180} \approx 0.6426$.
+
+Sustituyendo la ley de control por estados ampliados $u = -K_{\text{amp}} x_{\text{amp}} = -k_\theta \theta - k_\omega \dot{\theta} + H q$, la matriz de lazo cerrado resulta:
+\begin{equation}
+A_{\text{cl}} = A_{\text{amp}} - B_{\text{amp}} K_{\text{amp}} = 
+\begin{bmatrix} 
+0 & 1 & 0 \\ 
+-(a_0 + b k_\theta) & -(a_1 + b k_\omega) & b H \\ 
+-1 & 0 & 0 
+\end{bmatrix}
+\end{equation}
+
+El polinomio característico simbolicocerrado del sistema se obtiene calculando el determinante de $(sI - A_{\text{cl}})$:
+\begin{equation}
+P_{\text{cl}}(s) = \det(sI - A_{\text{cl}}) = s^3 + (a_1 + b k_\omega) s^2 + (a_0 + b k_\theta) s + b H
+\end{equation}
+
+Por otro lado, a partir de los polos deseados para el sistema $p_1, p_2$ (asociados a la barra) y $p_{\text{int}}$ (asociado al integrador), se define el polinomio característico objetivo:
+\begin{equation}
+P_{\text{des}}(s) = (s - p_1)(s - p_2)(s - p_{\text{int}}) = s^3 + \alpha_2 s^2 + \alpha_1 s + \alpha_0
+\end{equation}
+
+Igualando coeficiente a coeficiente ambos polinomios característicos, el algoritmo despeja un sistema de tres ecuaciones lineales con tres incógnitas:
+\begin{align}
+s^2: & \quad a_1 + b k_\omega = \alpha_2 \implies k_\omega = \frac{\alpha_2 - a_1}{b} \\[4pt]
+s^1: & \quad a_0 + b k_\theta = \alpha_1 \implies k_\theta = \frac{\alpha_1 - a_0}{b} \\[4pt]
+s^0: & \quad b H = \alpha_0 \implies H = \frac{\alpha_0}{b}
+\end{align}
+
+Alternativamente, para sistemas de mayor orden o no normalizados en forma canónica, el comando \texttt{place} de MATLAB/Octave resuelve esta asignación mediante la fórmula de Ackermann:
+\begin{equation}
+K_{\text{amp}} = \begin{bmatrix} 0 & 0 & 1 \end{bmatrix} \mathcal{C}_{\text{amp}}^{-1} P_{\text{des}}(A_{\text{amp}})
+\end{equation}
+donde $\mathcal{C}_{\text{amp}} = \begin{bmatrix} B_{\text{amp}} & A_{\text{amp}}B_{\text{amp}} & A_{\text{amp}}^2 B_{\text{amp}} \end{bmatrix}$ representa la matriz de controlabilidad del sistema ampliado y $P_{\text{des}}(A_{\text{amp}})$ es la evaluación del polinomio objetivo en la matriz $A_{\text{amp}}$.
+
+\subsection{Convención de Signos en la Ganancia del Integrador ($H$)}
+Al utilizar algoritmos de asignación de polos en software (como \texttt{place} en MATLAB/Octave), la ley de control se calcula por defecto bajo la formulación matricial homogénea $u = -K_{\text{amp}} x_{\text{amp}}$, aplicando un signo negativo uniforme a la totalidad del vector de estados ampliados:
+\begin{equation}
+u = -\left( K_{\text{amp}}(1)\theta + K_{\text{amp}}(2)\omega + K_{\text{amp}}(3)q \right)
+\end{equation}
+Sin embargo, desde la perspectiva física del control por realimentación de salida, se requiere que una acumulación positiva del error de seguimiento ($q > 0$) incremente de manera directa la acción sobre el actuador ($u$) para vencer la resistencia mecánica y corregir el desvío. Por lo tanto, al definir la ley de control explícita como $u = -K \hat{x} + H q$, la ganancia del integrador resulta $H = -K_{\text{amp}}(3)$. Esta inversión de signo asegura que la acción de la alcancía del error funcione como realimentación correctiva y no como una realimentación positiva desestabilizadora.
+
+\end{document}

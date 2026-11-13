@@ -1,6 +1,6 @@
-/* Practica8: control de angulo con observador Tustin e integrador a 50 Hz.
+/* Practica8: control de angulo con observador Tustin y dos modos a 50 Hz.
  * MPU6050 y filtro/calibracion conservados de Practica7. Servo en pin 9.
- * Configuracion: K_THETA, K_OMEGA, H_INTEGRAL, REFERENCIA_GRADOS.
+ * Configuracion: MODO_CONTROL, ganancias por modo, REFERENCIA_GRADOS.
  * Retardo asumido de 40 ms conservado del observador previo; validar en planta.
  * Control y telemetria se programan cada 20000 us. Si no se cumple el plazo,
  * se enclava el fallo y vuelve al centro; reiniciar para rearmar.
@@ -24,10 +24,18 @@ const uint16_t MUESTRAS_ASENTAMIENTO_FILTRO = 50; // 1 s a 50 Hz
 const uint16_t MUESTRAS_OFFSET_ANGULO = 150; // Promediar durante 3 s
 
 // Editar estas ganancias con los resultados de controlador_variable_estados.m.
-// u[us] = -K_THETA*thetaEst[rad] - K_OMEGA*omegaEst[rad/s] + H_INTEGRAL*q[rad*s].
-const float K_THETA = -260.6476f;
-const float K_OMEGA = 6.0377f;
-const float H_INTEGRAL = 3.7347e+03f;
+// Seleccionar REFERENCIA_FR o INTEGRAL antes de compilar y cargar.
+// El reinicio al cargar pone el integrador en cero.
+enum ModoControl { REFERENCIA_FR, INTEGRAL };
+const ModoControl MODO_CONTROL = REFERENCIA_FR;
+// Modo Fr: u = -K_ref*xhat + Fr*r. Polos [-20 -30].
+const float K_REF_THETA = -571.86852176f;
+const float K_REF_OMEGA = -0.18673258f;
+const float FR_REFERENCIA = 933.66289266f;
+// Modo integral: u = -K_int*xhat + H*q. Polos [-20 -30 -4].
+const float K_INT_THETA = -260.64755754f;
+const float K_INT_OMEGA = 6.03768671f;
+const float H_INTEGRAL = 3734.65157065f;
 const float REFERENCIA_GRADOS = 5.0f; // Relativa al cero calibrado
 const uint32_t ESPERA_REFERENCIA_US = 1000000UL;
 const int PULSO_MIN_US = 1100; // Confirmar limites mecanicos del equipo
@@ -151,7 +159,11 @@ void loop() {
   omegaEst = omegaNueva;
 
   const float error = referenciaRad-y;
-  const float uPedido = -K_THETA*thetaEst-K_OMEGA*omegaEst+H_INTEGRAL*integralError;
+  const bool modoIntegral = (MODO_CONTROL == INTEGRAL);
+  if (!modoIntegral) integralError = 0.0f;
+  const float uPedido = modoIntegral
+      ? -K_INT_THETA*thetaEst-K_INT_OMEGA*omegaEst+H_INTEGRAL*integralError
+      : -K_REF_THETA*thetaEst-K_REF_OMEGA*omegaEst+FR_REFERENCIA*referenciaRad;
   if (!isfinite(uPedido) || !isfinite(y) || !isfinite(omegaEst)) {
     fallos |= 4;
     detenido = true;
@@ -164,7 +176,7 @@ void loop() {
     // Integracion Euler a Ts fijo; congelar si agrava la saturacion.
     const bool agrava = (uPedido>=uMax && H_INTEGRAL*error>0) ||
                         (uPedido<=uMin && H_INTEGRAL*error<0);
-    if (!agrava) integralError += 0.02f*error;
+    if (modoIntegral && !agrava) integralError += 0.02f*error;
   } else {
     integralError = 0;
   }
