@@ -157,6 +157,11 @@ if isfolder(carpeta_referencia)
     copyfile(ruta_header, fullfile(carpeta_referencia, 'coeficientes_observador_completo.h'));
 end
 fprintf('Coeficientes exportados: %s\n', ruta_header);
+% El controlador integral conserva el observador de cuatro estados fisicos.
+carpeta_integral = fullfile(carpeta_arduino, '..', 'controlador_integral');
+if isfolder(carpeta_integral)
+    copyfile(ruta_header, fullfile(carpeta_integral, 'coeficientes_observador_completo.h'));
+end
 fprintf('Muestreo: %.0f Hz\n', 1/Ts);
 
 %% Retardo externo de la entrada y ecuacion para Arduino

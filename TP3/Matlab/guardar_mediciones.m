@@ -13,4 +13,4 @@ out_struct.tout = out.tout;
 
 % 2. Reemplazar la variable out y guardarla en el archivo .mat
 out = out_struct;
-save('controlador_con_referencia_ensayo_01.mat', 'out');
+save('controlador_con_integrador_secuencia_escalones_ensayo_06.mat', 'out');

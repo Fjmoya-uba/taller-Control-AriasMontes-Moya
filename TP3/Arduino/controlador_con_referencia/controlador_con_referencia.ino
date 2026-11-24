@@ -34,9 +34,15 @@ const float MAX_DISTANCIA_CM = 40.0f;
 const int PULSO_MIN_US = 1100, PULSO_MAX_US = 2000;
 // Distancia del sonar que define p=0; no es la consigna.
 const float CERO_POSICION_CM = 15.612f;
-// Consigna relativa al cero [cm]. Cambiar y recompilar para otro escalon.
-// Se aplica desde la primera medicion valida, despues de calibrar.
-const float POSICION_REFERENCIA_CM = 7.0f;
+// Escalones relativos a p=0. El primero empieza al activar el control.
+// Cada escalon dura 8 s; al finalizar se mantiene el ultimo, sin repetir.
+const float REFERENCIAS_CM[] = {-7.0f, 3.0f, 8.0f, -3.0f};
+const uint8_t CANTIDAD_REFERENCIAS = sizeof(REFERENCIAS_CM) / sizeof(REFERENCIAS_CM[0]);
+const uint32_t DURACION_ESCALON_US = 8000000UL;
+const uint32_t MUESTRAS_POR_ESCALON = DURACION_ESCALON_US / TS_US;
+static_assert(DURACION_ESCALON_US % TS_US == 0, "Duracion multiplo del muestreo");
+uint8_t indiceReferencia = 0;
+uint32_t muestrasEscalon = 0;
 
 const uint8_t VENTANA_VELOCIDAD = 5; // Intervalos de 20 ms.
 float historialPosicion[VENTANA_VELOCIDAD] = {};
@@ -192,7 +198,7 @@ void enviarTrama(float theta, float posicion, bool valida) {
 void aplicarControl() {
   uPedido = 0;
   if (!detenido && observadorInicializado) {
-    uPedido = CONTROL_FR * POSICION_REFERENCIA_CM;
+    uPedido = CONTROL_FR * REFERENCIAS_CM[indiceReferencia];
     for (uint8_t i = 0; i < 4; ++i) uPedido -= CONTROL_K[i]*xhat[i];
     if (!isfinite(uPedido)) {
       fallo |= 8;
@@ -286,6 +292,16 @@ void loop() {
   }
   aplicarControl();
   enviarTrama(theta, posicion, valida);
+
+  // Contar solo ciclos de control activos. La calibracion no consume escalones.
+  // Cambiar para el siguiente ciclo: exactamente 400 muestras por escalon.
+  if (!detenido && observadorInicializado &&
+      indiceReferencia < CANTIDAD_REFERENCIAS - 1) {
+    if (++muestrasEscalon >= MUESTRAS_POR_ESCALON) {
+      muestrasEscalon = 0;
+      ++indiceReferencia;
+    }
+  }
 
   // Preparar historial para el siguiente ciclo, incluso tras una parada.
   for (int i = RETARDO_MUESTRAS + 1; i > 0; --i)
